@@ -6,11 +6,13 @@
 #include "square.h"
 #include <iostream>
 
-void print_bitboard(Bitboard b) {
+using namespace chess_engine;
+
+void print_bitboard(bit::Bitboard b) {
     for (int rank = 7; rank >= 0; --rank) {
         for (int file = 0; file < 8; ++file) {
             int square = rank * 8 + file;
-            std::cout << (test_bit(b, square) ? "1 " : ". ");
+            std::cout << (bit::test_bit(b, square) ? "1 " : ". ");
         }
         std::cout << std::endl;
     }
@@ -18,7 +20,7 @@ void print_bitboard(Bitboard b) {
 }
 
 int main() {
-    Board board = set_position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+    board::Board board = board::set_position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 
     std::cout << board.to_string() << std::endl;
 

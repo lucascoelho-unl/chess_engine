@@ -1,12 +1,18 @@
-#ifndef BOARD_H
-#define BOARD_H
+#ifndef CHESS_ENGINE_BOARD_H
+#define CHESS_ENGINE_BOARD_H
 
 #include "bitboard.h"
 #include <string>
 
+namespace chess_engine {
+namespace board {
+
+using namespace chess_engine::bit;
+
 const int board_size = 64;
 
-enum Piece_Type {
+namespace piece {
+enum Type {
     PAWN,
     KNIGHT,
     BISHOP,
@@ -19,6 +25,7 @@ enum Color {
     WHITE,
     BLACK
 };
+} // namespace piece
 
 class Board {
   private:
@@ -151,4 +158,6 @@ class Board {
     }
 };
 
+} // namespace board
+} // namespace chess_engine
 #endif

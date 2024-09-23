@@ -2,9 +2,12 @@
 #include "bitboard.h"
 #include <iostream>
 
+namespace chess_engine {
+namespace board {
+
 Board set_position(std::string fen) {
-    Bitboard wp = 0ULL, wb = 0ULL, wn = 0ULL, wr = 0ULL, wq = 0ULL, wk = 0ULL;
-    Bitboard bp = 0ULL, bb = 0ULL, bn = 0ULL, br = 0ULL, bq = 0ULL, bk = 0ULL;
+    bit::Bitboard wp = 0ULL, wb = 0ULL, wn = 0ULL, wr = 0ULL, wq = 0ULL, wk = 0ULL;
+    bit::Bitboard bp = 0ULL, bb = 0ULL, bn = 0ULL, br = 0ULL, bq = 0ULL, bk = 0ULL;
 
     int rank = 56;
     int file = 0;
@@ -50,3 +53,5 @@ Board set_position(std::string fen) {
 
     return Board(wp, wb, wn, wr, wq, wk, bp, bb, bn, br, bq, bk);
 }
+} // namespace board
+} // namespace chess_engine

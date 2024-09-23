@@ -1,9 +1,12 @@
-#ifndef SQUARE_H
-#define SQUARE_H
+#ifndef CHESS_ENGINE_SQUARE_H
+#define CHESS_ENGINE_SQUARE_H
 
 #include <stdexcept>
 #include <string>
 #include <utility>
+
+namespace chess_engine {
+namespace square {
 
 // clang-format off
 enum Square {
@@ -64,4 +67,6 @@ inline Square string_to_square(const std::string &square_str) {
     return file_rank_to_square(file_idx, rank_idx);
 }
 
+} // namespace square
+} // namespace chess_engine
 #endif
