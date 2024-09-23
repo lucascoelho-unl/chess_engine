@@ -156,6 +156,8 @@ class Board {
     }
 };
 
+Board set_position(std::string fen);
+
 } // namespace board
 } // namespace chess_engine
 #endif
