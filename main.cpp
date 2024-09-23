@@ -1,5 +1,6 @@
 #include "bitboard.h"
 #include "board.cpp"
+#include "square.h"
 #include <iostream>
 
 void print_bitboard(Bitboard b) {
@@ -15,8 +16,6 @@ void print_bitboard(Bitboard b) {
 
 int main() {
     Board board = set_position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
-
-    board.create_white_pawn("e2", "e4");
 
     std::cout << board.to_string() << std::endl;
 

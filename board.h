@@ -4,9 +4,11 @@
 #include "bitboard.h"
 #include <string>
 
+typedef std::pair<Square, Square> Move;
+
 const int board_size = 64;
 
-enum piece_type {
+enum Piece_Type {
     PAWN,
     KNIGHT,
     BISHOP,
@@ -15,7 +17,7 @@ enum piece_type {
     KING
 };
 
-enum piece_color {
+enum Piece_Color {
     WHITE,
     BLACK
 };
@@ -48,45 +50,45 @@ class Board {
     }
 
     std::string to_string() const {
-        std::string chessBoard[8][8];
+        std::string chessboard[8][8];
 
         for (int i = 0; i < 64; ++i) {
-            chessBoard[i / 8][i % 8] = " ";
+            chessboard[i / 8][i % 8] = " ";
         }
 
         for (int i = 0; i < 64; ++i) {
             if (((wp >> i) & 1) == 1)
-                chessBoard[i / 8][i % 8] = "P";
+                chessboard[i / 8][i % 8] = "P";
             if (((wb >> i) & 1) == 1)
-                chessBoard[i / 8][i % 8] = "B";
+                chessboard[i / 8][i % 8] = "B";
             if (((wn >> i) & 1) == 1)
-                chessBoard[i / 8][i % 8] = "N";
+                chessboard[i / 8][i % 8] = "N";
             if (((wr >> i) & 1) == 1)
-                chessBoard[i / 8][i % 8] = "R";
+                chessboard[i / 8][i % 8] = "R";
             if (((wq >> i) & 1) == 1)
-                chessBoard[i / 8][i % 8] = "Q";
+                chessboard[i / 8][i % 8] = "Q";
             if (((wk >> i) & 1) == 1)
-                chessBoard[i / 8][i % 8] = "K";
+                chessboard[i / 8][i % 8] = "K";
 
             if (((bp >> i) & 1) == 1)
-                chessBoard[i / 8][i % 8] = "p";
+                chessboard[i / 8][i % 8] = "p";
             if (((bb >> i) & 1) == 1)
-                chessBoard[i / 8][i % 8] = "b";
+                chessboard[i / 8][i % 8] = "b";
             if (((bn >> i) & 1) == 1)
-                chessBoard[i / 8][i % 8] = "n";
+                chessboard[i / 8][i % 8] = "n";
             if (((br >> i) & 1) == 1)
-                chessBoard[i / 8][i % 8] = "r";
+                chessboard[i / 8][i % 8] = "r";
             if (((bq >> i) & 1) == 1)
-                chessBoard[i / 8][i % 8] = "q";
+                chessboard[i / 8][i % 8] = "q";
             if (((bk >> i) & 1) == 1)
-                chessBoard[i / 8][i % 8] = "k";
+                chessboard[i / 8][i % 8] = "k";
         }
 
         std::string result = "";
         for (int i = 7; i >= 0; --i) {
             result += "[ ";
             for (int j = 0; j < 8; ++j) {
-                result += chessBoard[i][j];
+                result += chessboard[i][j];
                 if (j < 7) {
                     result += " ";
                 }
@@ -95,12 +97,6 @@ class Board {
         }
 
         return result;
-    }
-
-    // Example setter for testing
-    void create_white_pawn(std::string s, std::string e) {
-        wp = set_bit(wp, e);
-        wp = clear_bit(wp, s);
     }
 
     // Getters for white pieces
