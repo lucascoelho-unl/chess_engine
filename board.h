@@ -4,8 +4,6 @@
 #include "bitboard.h"
 #include <string>
 
-typedef std::pair<Square, Square> Move;
-
 const int board_size = 64;
 
 enum Piece_Type {
@@ -17,7 +15,7 @@ enum Piece_Type {
     KING
 };
 
-enum Piece_Color {
+enum Color {
     WHITE,
     BLACK
 };
@@ -84,9 +82,11 @@ class Board {
                 chessboard[i / 8][i % 8] = "k";
         }
 
-        std::string result = "";
+        char label = 'h';
+        std::string result = "    1 2 3 4 5 6 7 8\n";
         for (int i = 7; i >= 0; --i) {
-            result += "[ ";
+            result += label;
+            result += " [ ";
             for (int j = 0; j < 8; ++j) {
                 result += chessboard[i][j];
                 if (j < 7) {
@@ -94,6 +94,7 @@ class Board {
                 }
             }
             result += " ]\n";
+            --label;
         }
 
         return result;

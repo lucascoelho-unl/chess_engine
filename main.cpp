@@ -1,5 +1,8 @@
 #include "bitboard.h"
 #include "board.cpp"
+#include "board.h"
+#include "moves.cpp"
+#include "moves.h"
 #include "square.h"
 #include <iostream>
 
