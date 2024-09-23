@@ -1,8 +1,8 @@
 #include "moves.h"
-#include "bitboard.h"
-#include "board.h"
-#include "pieces/pawn.cpp"
-#include "square.h"
+#include "../pieces/pawn.cpp"
+#include "../structure/bitboard.h"
+#include "../structure/board.h"
+#include "../structure/square.h"
 #include <sstream>
 #include <stdexcept>
 #include <string>

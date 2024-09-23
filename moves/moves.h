@@ -1,9 +1,9 @@
 #ifndef CHESS_ENGINE_MOVES_H
 #define CHESS_ENGINE_MOVES_H
 
-#include "bitboard.h"
-#include "board.h"
-#include "square.h"
+#include "../structure/bitboard.h"
+#include "../structure/board.h"
+#include "../structure/square.h"
 #include <vector>
 
 namespace chess_engine {

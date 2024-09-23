@@ -93,27 +93,31 @@ Hey Chat! I'm currently developing a project of a chess engine, and it is in pro
 
 # Current progress
 
-This is all steps that I'll take towards the goal to finish making the entire chess engine. The project is in C++, and the frontend aspect will be decided further on. I'm currently on a mac device. And below, you can see my current progress: 
+This is all steps that I'll take towards the goal to finish making the entire chess engine. The project is in C++, and the frontend aspect will be decided further on. I'm currently on a mac device. I'm using namespaces for organization. And below, you can see my current progress: 
 
-## Implemented bitboards representation and bitboards operation.
+## Bitboards
+Implemented bitboards representation and bitboards operation.
 - I can set a bit
 - I can clear a bit
 - I can test a bit
 
-## For the code to be more human-friendly, I implemented a Square enum, that gets various inputs (int, string, tuple) and transform them into chess notation that is equivalent to the square number of the bit. So A1 = 0, B1 = 1 ... H8 = 63.
+## Squares representation
+For the code to be more human-friendly, I implemented a Square enum, that gets various inputs (int, string, tuple) and transform them into chess notation that is equivalent to the square number of the bit. So A1 = 0, B1 = 1 ... H8 = 63.
 
-## Implemented the board class that holds 12 bitboards, one for each piece type and color. Each bitboard represents the pieces as a whole in the chess game. 
-
-## Implemented methods to get varous bitboards from the board class. 
+## Board
+Implemented the board class that holds 12 bitboards, one for each piece type and color. Each bitboard represents the pieces as a whole in the chess game. 
+Implemented methods to get varous bitboards from the board class. 
 - Get the bitboard from the pieces and colors
 - Get a bitboard of all ocupied squares
 - Get a bitboard of all empty squares
 - Get a bitboard from all white or all black pieces
 - Also a method to print the board for the human eye
 
-## Implemented a method to read FEN notation into the board and create a new board with the pieces in the correct position based on the FEN notation. 
+## FEN notation
+Implemented a method to read FEN notation into the board and create a new board with the pieces in the correct position based on the FEN notation. 
 
-## Currently developing pieces movement bitboards. For each piece, I'll implement a function that returns a bitboard of all valid moves. The structure will be lioke below: 
+## In-development
+Currently developing pieces movement bitboards. For each piece, I'll implement a function that returns a bitboard of all valid moves. The structure will be lioke below: 
 // Get moves from a specific square for a piece of the specified color
 Bitboard get_pawn_moves(Square from, Color color, const Board &board);
 Bitboard get_knight_moves(Square from, Color color, const Board &board);

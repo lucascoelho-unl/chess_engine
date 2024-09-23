@@ -1,9 +1,9 @@
-#include "bitboard.h"
-#include "board.cpp"
-#include "board.h"
-#include "moves.cpp"
-#include "moves.h"
-#include "square.h"
+#include "moves/moves.cpp"
+#include "moves/moves.h"
+#include "structure/bitboard.h"
+#include "structure/board.cpp"
+#include "structure/board.h"
+#include "structure/square.h"
 #include <iostream>
 
 using namespace chess_engine;
