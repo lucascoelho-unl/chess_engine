@@ -7,8 +7,6 @@
 namespace chess_engine {
 namespace board {
 
-using namespace chess_engine::bit;
-
 const int board_size = 64;
 
 namespace piece {
@@ -29,28 +27,28 @@ enum Color {
 
 class Board {
   private:
-    Bitboard wp, wb, wn, wr, wq, wk = 0ULL; // White pieces
-    Bitboard bp, bb, bn, br, bq, bk = 0ULL; // Black pieces
+    bit::Bitboard wp, wb, wn, wr, wq, wk = 0ULL; // White pieces
+    bit::Bitboard bp, bb, bn, br, bq, bk = 0ULL; // Black pieces
 
   public:
-    Board(Bitboard wp, Bitboard wb, Bitboard wn, Bitboard wr, Bitboard wq, Bitboard wk,
-          Bitboard bp, Bitboard bb, Bitboard bn, Bitboard br, Bitboard bq, Bitboard bk)
+    Board(bit::Bitboard wp, bit::Bitboard wb, bit::Bitboard wn, bit::Bitboard wr, bit::Bitboard wq, bit::Bitboard wk,
+          bit::Bitboard bp, bit::Bitboard bb, bit::Bitboard bn, bit::Bitboard br, bit::Bitboard bq, bit::Bitboard bk)
         : wp(wp), wb(wb), wn(wn), wr(wr), wq(wq), wk(wk),
           bp(bp), bb(bb), bn(bn), br(br), bq(bq), bk(bk) {}
 
-    inline Bitboard get_white_pieces() const {
+    inline bit::Bitboard get_white_pieces() const {
         return (wp | wb | wn | wr | wq | wk);
     }
 
-    inline Bitboard get_black_pieces() const {
+    inline bit::Bitboard get_black_pieces() const {
         return (bp | bb | bn | br | bq | bk);
     }
 
-    inline Bitboard get_occupied_squares() const {
+    inline bit::Bitboard get_occupied_squares() const {
         return (get_white_pieces() | get_black_pieces());
     }
 
-    inline Bitboard get_empty_squares() const {
+    inline bit::Bitboard get_empty_squares() const {
         return ~get_occupied_squares();
     }
 
@@ -108,52 +106,52 @@ class Board {
     }
 
     // Getters for white pieces
-    inline const Bitboard &get_white_pawns() const {
+    inline const bit::Bitboard &get_white_pawns() const {
         return wp;
     }
 
-    inline const Bitboard &get_white_knights() const {
+    inline const bit::Bitboard &get_white_knights() const {
         return wn;
     }
 
-    inline const Bitboard &get_white_bishops() const {
+    inline const bit::Bitboard &get_white_bishops() const {
         return wb;
     }
 
-    inline const Bitboard &get_white_rooks() const {
+    inline const bit::Bitboard &get_white_rooks() const {
         return wr;
     }
 
-    inline const Bitboard &get_white_queen() const {
+    inline const bit::Bitboard &get_white_queen() const {
         return wq;
     }
 
-    inline const Bitboard &get_white_king() const {
+    inline const bit::Bitboard &get_white_king() const {
         return wk;
     }
 
     // Getters for black pieces
-    inline const Bitboard &get_black_pawns() const {
+    inline const bit::Bitboard &get_black_pawns() const {
         return bp;
     }
 
-    inline const Bitboard &get_black_knights() const {
+    inline const bit::Bitboard &get_black_knights() const {
         return bn;
     }
 
-    inline const Bitboard &get_black_bishops() const {
+    inline const bit::Bitboard &get_black_bishops() const {
         return bb;
     }
 
-    inline const Bitboard &get_black_rooks() const {
+    inline const bit::Bitboard &get_black_rooks() const {
         return br;
     }
 
-    inline const Bitboard &get_black_queen() const {
+    inline const bit::Bitboard &get_black_queen() const {
         return bq;
     }
 
-    inline const Bitboard &get_black_king() const {
+    inline const bit::Bitboard &get_black_king() const {
         return bk;
     }
 };

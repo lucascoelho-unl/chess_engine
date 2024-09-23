@@ -16,30 +16,30 @@ Board set_position(std::string fen) {
         int square = rank + file;
 
         if (c == 'P')
-            wp = set_bit(wp, square);
+            wp = bit::set_bit(wp, square);
         else if (c == 'B')
-            wb = set_bit(wb, square);
+            wb = bit::set_bit(wb, square);
         else if (c == 'N')
-            wn = set_bit(wn, square);
+            wn = bit::set_bit(wn, square);
         else if (c == 'R')
-            wr = set_bit(wr, square);
+            wr = bit::set_bit(wr, square);
         else if (c == 'Q')
-            wq = set_bit(wq, square);
+            wq = bit::set_bit(wq, square);
         else if (c == 'K')
-            wk = set_bit(wk, square);
+            wk = bit::set_bit(wk, square);
 
         else if (c == 'p')
-            bp = set_bit(bp, square);
+            bp = bit::set_bit(bp, square);
         else if (c == 'b')
-            bb = set_bit(bb, square);
+            bb = bit::set_bit(bb, square);
         else if (c == 'n')
-            bn = set_bit(bn, square);
+            bn = bit::set_bit(bn, square);
         else if (c == 'r')
-            br = set_bit(br, square);
+            br = bit::set_bit(br, square);
         else if (c == 'q')
-            bq = set_bit(bq, square);
+            bq = bit::set_bit(bq, square);
         else if (c == 'k')
-            bk = set_bit(bk, square);
+            bk = bit::set_bit(bk, square);
         else
             file += (c - '1');
 
