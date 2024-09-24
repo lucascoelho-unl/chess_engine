@@ -10,5 +10,6 @@ add_executable(chess_engine
     structure/board.cpp
     moves/moves.cpp
     pieces/pawn.cpp
+    pieces/knight.cpp
     # other source files...
 )

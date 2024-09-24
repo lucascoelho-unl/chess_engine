@@ -9,6 +9,24 @@ namespace board {
 
 const int board_size = 64;
 
+extern bit::Bitboard a_file;
+extern bit::Bitboard b_file;
+extern bit::Bitboard c_file;
+extern bit::Bitboard d_file;
+extern bit::Bitboard e_file;
+extern bit::Bitboard f_file;
+extern bit::Bitboard g_file;
+extern bit::Bitboard h_file;
+
+extern bit::Bitboard rank_1;
+extern bit::Bitboard rank_2;
+extern bit::Bitboard rank_3;
+extern bit::Bitboard rank_4;
+extern bit::Bitboard rank_5;
+extern bit::Bitboard rank_6;
+extern bit::Bitboard rank_7;
+extern bit::Bitboard rank_8;
+
 namespace piece {
 enum Type {
     PAWN,
@@ -87,11 +105,11 @@ class Board {
                 chessboard[i / 8][i % 8] = "k";
         }
 
-        char label = 'h';
-        std::string result = "    1 2 3 4 5 6 7 8\n";
+        char label = '8';
+        std::string result = "     a b c d e f g h\n\n";
         for (int i = 7; i >= 0; --i) {
             result += label;
-            result += " [ ";
+            result += "  [ ";
             for (int j = 0; j < 8; ++j) {
                 result += chessboard[i][j];
                 if (j < 7) {
@@ -101,7 +119,6 @@ class Board {
             result += " ]\n";
             --label;
         }
-
         return result;
     }
 

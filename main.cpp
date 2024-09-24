@@ -5,6 +5,8 @@
 #include "utils.h"
 #include <iostream>
 
+#include "pieces/knight.h"
+
 using namespace chess_engine;
 
 int main() {
@@ -12,9 +14,9 @@ int main() {
 
     std::cout << board.to_string() << std::endl;
 
-    bit::Bitboard pawn_moves = moves::get_pawn_moves(square::C2, board::piece::WHITE, board);
+    bit::Bitboard knight_moves = moves::get_knight_moves(square::B1, board::piece::WHITE, board);
 
-    utils::print_bitboard(pawn_moves);
+    utils::print_bitboard(knight_moves);
 
     return 0;
 }

@@ -1,4 +1,5 @@
 #include "moves.h"
+#include "../pieces/knight.h"
 #include "../pieces/pawn.h"
 #include "../structure/bitboard.h"
 #include "../structure/board.h"
@@ -11,7 +12,11 @@ namespace chess_engine {
 namespace moves {
 
 bit::Bitboard get_pawn_moves(square::Square from, board::piece::Color color, const board::Board &board) {
-    return chess_engine::pawn::get_moves(from, color, board);
+    return pawn::get_moves(from, color, board);
+}
+
+bit::Bitboard get_knight_moves(square::Square from, board::piece::Color color, const board::Board &board) {
+    return knight::get_moves(from, color, board);
 }
 
 } // namespace moves

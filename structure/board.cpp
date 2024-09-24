@@ -5,6 +5,24 @@
 namespace chess_engine {
 namespace board {
 
+bit::Bitboard a_file = 72340172838076673ULL;
+bit::Bitboard b_file = 144680345676153346ULL;
+bit::Bitboard c_file = 289360691352306692ULL;
+bit::Bitboard d_file = 578721382704613384ULL;
+bit::Bitboard e_file = 1157442765409226768ULL;
+bit::Bitboard f_file = 2314885530818453536ULL;
+bit::Bitboard g_file = 4629771061636907072ULL;
+bit::Bitboard h_file = 9259542123273814144ULL;
+
+bit::Bitboard rank_1 = 255ULL;
+bit::Bitboard rank_2 = 65280ULL;
+bit::Bitboard rank_3 = 16711680ULL;
+bit::Bitboard rank_4 = 4278190080ULL;
+bit::Bitboard rank_5 = 1095216660480ULL;
+bit::Bitboard rank_6 = 280375465082880ULL;
+bit::Bitboard rank_7 = 71776119061217280ULL;
+bit::Bitboard rank_8 = 18374686479671623680ULL;
+
 Board set_position(std::string fen) {
     bit::Bitboard wp = 0ULL, wb = 0ULL, wn = 0ULL, wr = 0ULL, wq = 0ULL, wk = 0ULL;
     bit::Bitboard bp = 0ULL, bb = 0ULL, bn = 0ULL, br = 0ULL, bq = 0ULL, bk = 0ULL;

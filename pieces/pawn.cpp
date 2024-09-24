@@ -26,7 +26,7 @@ bit::Bitboard get_moves(square::Square from, board::piece::Color color, const bo
 
     if (color == board::piece::WHITE) {
         p1 = (curr_position << 8) & valid_positions;
-        if ((p1 != 0) && (8 <= from <= 15))
+        if ((p1 != 0) && (from >= 8 && from < 16))
             p2 = (curr_position << 16) & valid_positions;
         p3 = ((curr_position) << 7) & board.get_black_pawns();
         p4 = ((curr_position) << 9) & board.get_black_pawns();
@@ -34,7 +34,7 @@ bit::Bitboard get_moves(square::Square from, board::piece::Color color, const bo
 
     if (color == board::piece::BLACK) {
         p1 = (curr_position >> 8) & valid_positions;
-        if ((p1 != 0) && (48 <= from <= 55))
+        if ((p1 != 0) && (from >= 48 && from < 56))
             p2 = (curr_position >> 16) & valid_positions;
         p3 = ((curr_position) >> 7) & board.get_black_pawns();
         p4 = ((curr_position) >> 9) & board.get_black_pawns();
