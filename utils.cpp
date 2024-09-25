@@ -3,7 +3,10 @@
 #include "structure/bitboard.h"
 #include "structure/board.h"
 #include "structure/square.h"
+#include <array>
+#include <cstdint>
 #include <iostream>
+#include <vector>
 
 namespace utils {
 
@@ -19,4 +22,5 @@ void print_bitboard(bit::Bitboard b) {
     }
     std::cout << std::endl;
 }
+
 } // namespace utils

@@ -9,7 +9,10 @@ add_executable(chess_engine
     utils.cpp
     structure/board.cpp
     moves/moves.cpp
+    moves/slide/diagonal.cpp
+    moves/slide/straight.cpp
     pieces/pawn.cpp
     pieces/knight.cpp
+    pieces/rook.cpp
     # other source files...
 )

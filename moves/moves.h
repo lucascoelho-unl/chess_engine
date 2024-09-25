@@ -14,6 +14,8 @@ struct Move {
     square::Square to;
 };
 
+extern bit::Bitboard corners_mask;
+
 // Get moves from a specific square for a piece of the specified color
 bit::Bitboard get_pawn_moves(square::Square from, board::piece::Color color, const board::Board &board);
 bit::Bitboard get_knight_moves(square::Square from, board::piece::Color color, const board::Board &board);
