@@ -8,7 +8,7 @@ namespace chess_engine {
 namespace bishop {
 
 bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board) {
-    bit::Bitboard bishop_positions = (color == board::piece::Color::WHITE) ? board.get_white_bishops() : board.get_black_bishops();
+    bit::Bitboard bishop_positions = board.get_bishops(color);
     if (((1ULL << from) & bishop_positions) == 0) {
         std::ostringstream oss;
         oss << "Bishop at position " << static_cast<int>(from) << " does not exist";

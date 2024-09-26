@@ -36,7 +36,7 @@ bit::Bitboard get_all_king_moves(board::piece::Color color, const board::Board &
 bit::Bitboard get_piece_moves(int from, board::piece::Type piece, board::piece::Color color, const board::Board &board);
 
 // Generate all valid moves for the specified color
-std::vector<Move> generate_all_valid_moves(board::piece::Color color);
+bit::Bitboard generate_all_piece_moves(board::piece::Color color, const board::Board &board);
 
 } // namespace moves
 } // namespace chess_engine

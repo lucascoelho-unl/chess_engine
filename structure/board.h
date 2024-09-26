@@ -54,6 +54,7 @@ class Board {
         : wp(wp), wb(wb), wn(wn), wr(wr), wq(wq), wk(wk),
           bp(bp), bb(bb), bn(bn), br(br), bq(bq), bk(bk) {}
 
+    // Combined white or black pieces
     inline bit::Bitboard get_white_pieces() const {
         return (wp | wb | wn | wr | wq | wk);
     }
@@ -62,6 +63,7 @@ class Board {
         return (bp | bb | bn | br | bq | bk);
     }
 
+    // Occupied and empty squares
     inline bit::Bitboard get_occupied_squares() const {
         return (get_white_pieces() | get_black_pieces());
     }
@@ -70,6 +72,7 @@ class Board {
         return ~get_occupied_squares();
     }
 
+    // to_string() function for printing the board
     std::string to_string() const {
         std::string chessboard[8][8];
 
@@ -77,33 +80,23 @@ class Board {
             chessboard[i / 8][i % 8] = " ";
         }
 
+        // clang-format off
         for (int i = 0; i < 64; ++i) {
-            if (((wp >> i) & 1) == 1)
-                chessboard[i / 8][i % 8] = "P";
-            if (((wb >> i) & 1) == 1)
-                chessboard[i / 8][i % 8] = "B";
-            if (((wn >> i) & 1) == 1)
-                chessboard[i / 8][i % 8] = "N";
-            if (((wr >> i) & 1) == 1)
-                chessboard[i / 8][i % 8] = "R";
-            if (((wq >> i) & 1) == 1)
-                chessboard[i / 8][i % 8] = "Q";
-            if (((wk >> i) & 1) == 1)
-                chessboard[i / 8][i % 8] = "K";
+            if (((wp >> i) & 1) == 1) chessboard[i / 8][i % 8] = "P";
+            if (((wb >> i) & 1) == 1) chessboard[i / 8][i % 8] = "B";
+            if (((wn >> i) & 1) == 1) chessboard[i / 8][i % 8] = "N";
+            if (((wr >> i) & 1) == 1) chessboard[i / 8][i % 8] = "R";
+            if (((wq >> i) & 1) == 1) chessboard[i / 8][i % 8] = "Q";
+            if (((wk >> i) & 1) == 1) chessboard[i / 8][i % 8] = "K";
 
-            if (((bp >> i) & 1) == 1)
-                chessboard[i / 8][i % 8] = "p";
-            if (((bb >> i) & 1) == 1)
-                chessboard[i / 8][i % 8] = "b";
-            if (((bn >> i) & 1) == 1)
-                chessboard[i / 8][i % 8] = "n";
-            if (((br >> i) & 1) == 1)
-                chessboard[i / 8][i % 8] = "r";
-            if (((bq >> i) & 1) == 1)
-                chessboard[i / 8][i % 8] = "q";
-            if (((bk >> i) & 1) == 1)
-                chessboard[i / 8][i % 8] = "k";
+            if (((bp >> i) & 1) == 1) chessboard[i / 8][i % 8] = "p";
+            if (((bb >> i) & 1) == 1) chessboard[i / 8][i % 8] = "b";
+            if (((bn >> i) & 1) == 1) chessboard[i / 8][i % 8] = "n";
+            if (((br >> i) & 1) == 1) chessboard[i / 8][i % 8] = "r";
+            if (((bq >> i) & 1) == 1) chessboard[i / 8][i % 8] = "q";
+            if (((bk >> i) & 1) == 1) chessboard[i / 8][i % 8] = "k";
         }
+        // clang-format on
 
         char label = '8';
         std::string result = "     a b c d e f g h\n\n";
@@ -122,54 +115,48 @@ class Board {
         return result;
     }
 
-    // Getters for white pieces
-    inline const bit::Bitboard &get_white_pawns() const {
-        return wp;
+    // Getters for pieces based on color
+    inline const bit::Bitboard &get_pawns(piece::Color color) const {
+        return (color == piece::Color::WHITE) ? wp : bp;
     }
 
-    inline const bit::Bitboard &get_white_knights() const {
-        return wn;
+    inline const bit::Bitboard &get_knights(piece::Color color) const {
+        return (color == piece::Color::WHITE) ? wn : bn;
     }
 
-    inline const bit::Bitboard &get_white_bishops() const {
-        return wb;
+    inline const bit::Bitboard &get_bishops(piece::Color color) const {
+        return (color == piece::Color::WHITE) ? wb : bb;
     }
 
-    inline const bit::Bitboard &get_white_rooks() const {
-        return wr;
+    inline const bit::Bitboard &get_rooks(piece::Color color) const {
+        return (color == piece::Color::WHITE) ? wr : br;
     }
 
-    inline const bit::Bitboard &get_white_queens() const {
-        return wq;
+    inline const bit::Bitboard &get_queens(piece::Color color) const {
+        return (color == piece::Color::WHITE) ? wq : bq;
     }
 
-    inline const bit::Bitboard &get_white_king() const {
-        return wk;
+    inline const bit::Bitboard &get_king(piece::Color color) const {
+        return (color == piece::Color::WHITE) ? wk : bk;
     }
 
-    // Getters for black pieces
-    inline const bit::Bitboard &get_black_pawns() const {
-        return bp;
-    }
-
-    inline const bit::Bitboard &get_black_knights() const {
-        return bn;
-    }
-
-    inline const bit::Bitboard &get_black_bishops() const {
-        return bb;
-    }
-
-    inline const bit::Bitboard &get_black_rooks() const {
-        return br;
-    }
-
-    inline const bit::Bitboard &get_black_queens() const {
-        return bq;
-    }
-
-    inline const bit::Bitboard &get_black_king() const {
-        return bk;
+    inline const bit::Bitboard &get_pieces(piece::Type type, piece::Color color) const {
+        switch (type) {
+        case piece::PAWN:
+            return get_pawns(color);
+        case piece::KNIGHT:
+            return get_knights(color);
+        case piece::BISHOP:
+            return get_bishops(color);
+        case piece::ROOK:
+            return get_rooks(color);
+        case piece::QUEEN:
+            return get_queens(color);
+        case piece::KING:
+            return get_king(color);
+        default:
+            throw std::invalid_argument("Invalid piece type");
+        }
     }
 };
 

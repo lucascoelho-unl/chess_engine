@@ -9,12 +9,12 @@ using namespace chess_engine;
 
 int main() {
 
-    board::Board board = board::set_position("rnbqkbnr/pBppBppp/8/P7/8/8/8/3N3N");
+    board::Board board = board::set_position("1b1r1b1r/8/8/8/8/8/8/8");
 
-    bit::Bitboard pawn_move = moves::get_all_bishop_moves(board::piece::Color::WHITE, board);
+    bit::Bitboard all_moves = moves::generate_all_piece_moves(board::piece::Color::BLACK, board);
 
     std::cout << board.to_string() << std::endl;
-    utils::print_bitboard(pawn_move);
+    utils::print_bitboard(all_moves);
 
     return 0;
 }

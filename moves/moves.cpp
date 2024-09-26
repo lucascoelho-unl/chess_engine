@@ -11,159 +11,163 @@
 #include "../utils.h"
 #include "slide/diagonal.h"
 #include "slide/straight.h"
+#include <future>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace chess_engine {
 namespace moves {
 
-bit::Bitboard corners_mask = 35604928818740736ULL;
-
-bit::Bitboard get_pawn_moves(int from, board::piece::Color color, const board::Board &board) {
+inline bit::Bitboard get_pawn_moves(int from, board::piece::Color color, const board::Board &board) {
     return pawn::get_moves(from, color, board);
 }
 
-bit::Bitboard get_knight_moves(int from, board::piece::Color color, const board::Board &board) {
+inline bit::Bitboard get_knight_moves(int from, board::piece::Color color, const board::Board &board) {
     return knight::get_moves(from, color, board);
 }
 
-bit::Bitboard get_rook_moves(int from, board::piece::Color color, const board::Board &board) {
+inline bit::Bitboard get_rook_moves(int from, board::piece::Color color, const board::Board &board) {
     return rook::get_moves(from, color, board);
 }
 
-bit::Bitboard get_bishop_moves(int from, board::piece::Color color, const board::Board &board) {
+inline bit::Bitboard get_bishop_moves(int from, board::piece::Color color, const board::Board &board) {
     return bishop::get_moves(from, color, board);
 }
 
-bit::Bitboard get_queen_moves(int from, board::piece::Color color, const board::Board &board) {
+inline bit::Bitboard get_queen_moves(int from, board::piece::Color color, const board::Board &board) {
     return queen::get_moves(from, color, board);
 }
 
-bit::Bitboard get_king_moves(int from, board::piece::Color color, const board::Board &board) {
+inline bit::Bitboard get_king_moves(int from, board::piece::Color color, const board::Board &board) {
     return king::get_moves(from, color, board);
 }
 
-bit::Bitboard get_all_pawn_moves(board::piece::Color color, const board::Board &board) {
-    bit::Bitboard all_pawn_moves = 0ULL;
-    bit::Bitboard current_pawn_positions = (color == board::piece::Color::WHITE) ? board.get_white_pawns() : board.get_black_pawns();
-    for (int sq = 0; sq < 64; ++sq) {
-        if ((1ULL << sq) & current_pawn_positions) {
-            all_pawn_moves |= get_pawn_moves(sq, color, board);
-        }
+template <typename Get_Moves_Func>
+bit::Bitboard get_all_moves(board::piece::Type type, board::piece::Color color, const board::Board &board, Get_Moves_Func get_moves) {
+    bit::Bitboard all_moves = 0ULL;
+    bit::Bitboard curr_pieces = board.get_pieces(type, color);
+
+    while (curr_pieces) {
+        int square = __builtin_ctzll(curr_pieces);    // Get index of least significant bit
+        curr_pieces &= curr_pieces - 1;               // Remove the LSB
+        all_moves |= get_moves(square, color, board); // Combine all possible moves
     }
-    return all_pawn_moves;
+
+    return all_moves;
+}
+
+// Generalized function for all types
+bit::Bitboard get_all_moves_for_piece(board::piece::Type type, board::piece::Color color, const board::Board &board) {
+    switch (type) {
+    case board::piece::Type::PAWN:
+        return get_all_moves(type, color, board, get_pawn_moves);
+    case board::piece::Type::KNIGHT:
+        return get_all_moves(type, color, board, get_knight_moves);
+    case board::piece::Type::BISHOP:
+        return get_all_moves(type, color, board, get_bishop_moves);
+    case board::piece::Type::ROOK:
+        return get_all_moves(type, color, board, get_rook_moves);
+    case board::piece::Type::QUEEN:
+        return get_all_moves(type, color, board, get_queen_moves);
+    case board::piece::Type::KING:
+        return get_all_moves(type, color, board, get_king_moves);
+    default:
+        return 0ULL; // Return 0 if piece type is invalid
+    }
+}
+
+inline bool is_piece_at_position(int from, bit::Bitboard piece_positions) {
+    return (piece_positions & (1ULL << from)) != 0;
+}
+
+bit::Bitboard get_all_pawn_moves(board::piece::Color color, const board::Board &board) {
+    return get_all_moves(board::piece::Type::PAWN, color, board, get_pawn_moves);
 }
 
 bit::Bitboard get_all_knight_moves(board::piece::Color color, const board::Board &board) {
-    bit::Bitboard all_knight_moves = 0ULL;
-    bit::Bitboard current_knight_positions = (color == board::piece::Color::WHITE) ? board.get_white_knights() : board.get_black_knights();
-    for (int sq = 0; sq < 64; ++sq) {
-        if ((1ULL << sq) & current_knight_positions) {
-            all_knight_moves |= get_knight_moves(sq, color, board);
-        }
-    }
-    return all_knight_moves;
+    return get_all_moves(board::piece::Type::KNIGHT, color, board, get_knight_moves);
 }
 
 bit::Bitboard get_all_bishop_moves(board::piece::Color color, const board::Board &board) {
-    bit::Bitboard all_bishop_moves = 0ULL;
-    bit::Bitboard current_bishop_positions = (color == board::piece::Color::WHITE) ? board.get_white_bishops() : board.get_black_bishops();
-    for (int sq = 0; sq < 64; ++sq) {
-        if ((1ULL << sq) & current_bishop_positions) {
-            all_bishop_moves |= get_bishop_moves(sq, color, board);
-        }
-    }
-    return all_bishop_moves;
+    return get_all_moves(board::piece::Type::BISHOP, color, board, get_bishop_moves);
 }
 
 bit::Bitboard get_all_rook_moves(board::piece::Color color, const board::Board &board) {
-    bit::Bitboard all_rook_moves = 0ULL;
-    bit::Bitboard current_rook_positions = (color == board::piece::Color::WHITE) ? board.get_white_rooks() : board.get_black_rooks();
-    for (int sq = 0; sq < 64; ++sq) {
-        if ((1ULL << sq) & current_rook_positions) {
-            all_rook_moves |= get_rook_moves(sq, color, board);
-        }
-    }
-    return all_rook_moves;
+    return get_all_moves(board::piece::Type::ROOK, color, board, get_rook_moves);
 }
 
 bit::Bitboard get_all_queen_moves(board::piece::Color color, const board::Board &board) {
-    bit::Bitboard all_queen_moves = 0ULL;
-    bit::Bitboard current_queen_positions = (color == board::piece::Color::WHITE) ? board.get_white_queens() : board.get_black_queens();
-    for (int sq = 0; sq < 64; ++sq) {
-        if ((1ULL << sq) & current_queen_positions) {
-            all_queen_moves |= get_queen_moves(sq, color, board);
-        }
-    }
-    return all_queen_moves;
+    return get_all_moves(board::piece::Type::QUEEN, color, board, get_queen_moves);
 }
 
 bit::Bitboard get_all_king_moves(board::piece::Color color, const board::Board &board) {
-    bit::Bitboard all_king_moves = 0ULL;
-    bit::Bitboard current_king_positions = (color == board::piece::Color::WHITE) ? board.get_white_king() : board.get_black_king();
-    for (int sq = 0; sq < 64; ++sq) {
-        if ((1ULL << sq) & current_king_positions) {
-            all_king_moves |= get_king_moves(sq, color, board);
-        }
-    }
-    return all_king_moves;
+    return get_all_moves(board::piece::Type::KING, color, board, get_king_moves);
 }
 
-bit::Bitboard get_piece_moves(int from, board::piece::Type piece, board::piece::Color color, const board::Board &board) {
+bit::Bitboard get_piece_moves(int from, board::piece::Type type, board::piece::Color color, const board::Board &board) {
     bit::Bitboard moves = 0ULL;
-    bit::Bitboard current_piece_positions;
+    bit::Bitboard current_piece_positions = board.get_pieces(type, color);
 
-    // Get the bitboard for the current piece type
-    switch (piece) {
-    case board::piece::Type::PAWN:
-        current_piece_positions = (color == board::piece::Color::WHITE) ? board.get_white_pawns() : board.get_black_pawns();
-        break;
-    case board::piece::Type::KNIGHT:
-        current_piece_positions = (color == board::piece::Color::WHITE) ? board.get_white_knights() : board.get_black_knights();
-        break;
-    case board::piece::Type::BISHOP:
-        current_piece_positions = (color == board::piece::Color::WHITE) ? board.get_white_bishops() : board.get_black_bishops();
-        break;
-    case board::piece::Type::ROOK:
-        current_piece_positions = (color == board::piece::Color::WHITE) ? board.get_white_rooks() : board.get_black_rooks();
-        break;
-    case board::piece::Type::QUEEN:
-        current_piece_positions = (color == board::piece::Color::WHITE) ? board.get_white_queens() : board.get_black_queens();
-        break;
-    case board::piece::Type::KING:
-        current_piece_positions = (color == board::piece::Color::WHITE) ? board.get_white_king() : board.get_black_king();
-        break;
+    if (!is_piece_at_position(from, current_piece_positions)) {
+        return 0ULL; // No need to throw exceptions, return invalid moves
     }
 
-    if ((current_piece_positions & (1ULL << from)) == 0) {
-        std::ostringstream oss;
-        oss << piece << " at position " << static_cast<int>(from) << " does not exist";
-        throw std::invalid_argument(oss.str());
-    }
-
-    // Loop through all squares and apply the respective move function
-    switch (piece) {
+    // Switch case for respective piece move functions
+    switch (type) {
     case board::piece::Type::PAWN:
-        moves |= get_pawn_moves(from, color, board);
+        moves = get_pawn_moves(from, color, board);
         break;
     case board::piece::Type::KNIGHT:
-        moves |= get_knight_moves(from, color, board);
+        moves = get_knight_moves(from, color, board);
         break;
     case board::piece::Type::BISHOP:
-        moves |= get_bishop_moves(from, color, board);
+        moves = get_bishop_moves(from, color, board);
         break;
     case board::piece::Type::ROOK:
-        moves |= get_rook_moves(from, color, board);
+        moves = get_rook_moves(from, color, board);
         break;
     case board::piece::Type::QUEEN:
-        moves |= get_queen_moves(from, color, board);
+        moves = get_queen_moves(from, color, board);
         break;
     case board::piece::Type::KING:
-        moves |= get_king_moves(from, color, board);
+        moves = get_king_moves(from, color, board);
         break;
     }
     return moves;
+}
+
+bit::Bitboard generate_all_piece_moves(board::piece::Color color, const board::Board &board) {
+    // Create a vector of futures to hold the async results
+    std::vector<std::future<bit::Bitboard>> move_futures;
+
+    // Launch asynchronous tasks to generate moves for each piece type
+    move_futures.emplace_back(std::async(std::launch::async, [&board, color]() {
+        return get_all_moves_for_piece(board::piece::Type::PAWN, color, board);
+    }));
+    move_futures.emplace_back(std::async(std::launch::async, [&board, color]() {
+        return get_all_moves_for_piece(board::piece::Type::KNIGHT, color, board);
+    }));
+    move_futures.emplace_back(std::async(std::launch::async, [&board, color]() {
+        return get_all_moves_for_piece(board::piece::Type::BISHOP, color, board);
+    }));
+    move_futures.emplace_back(std::async(std::launch::async, [&board, color]() {
+        return get_all_moves_for_piece(board::piece::Type::ROOK, color, board);
+    }));
+    move_futures.emplace_back(std::async(std::launch::async, [&board, color]() {
+        return get_all_moves_for_piece(board::piece::Type::QUEEN, color, board);
+    }));
+    move_futures.emplace_back(std::async(std::launch::async, [&board, color]() {
+        return get_all_moves_for_piece(board::piece::Type::KING, color, board);
+    }));
+
+    // Initialize a bitboard to hold all combined moves
+    bit::Bitboard all_moves = 0ULL;
+    for (auto &future : move_futures) {
+        all_moves |= future.get(); // Wait for the future to be ready and combine the result
+    }
+    return all_moves;
 }
 
 } // namespace moves
