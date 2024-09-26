@@ -8,12 +8,15 @@
 using namespace chess_engine;
 
 int main() {
-    board::Board board = board::set_position("Q7/8/8/8/pppppppp/8/8/8");
 
-    bit::Bitboard bishop_moves = moves::get_queen_moves(square::A8, board::piece::Color::WHITE, board);
+    board::Board board = board::set_position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+
+    bit::Bitboard queen_moves = moves::get_queen_moves(square::D1, board::piece::Color::WHITE, board);
+
+    bit::Bitboard king_moves = moves::get_king_moves(square::E1, board::piece::Color::WHITE, board);
 
     std::cout << board.to_string() << std::endl;
-    utils::print_bitboard(bishop_moves);
+    utils::print_bitboard(king_moves);
 
     return 0;
 }

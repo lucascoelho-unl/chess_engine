@@ -16,5 +16,6 @@ add_executable(chess_engine
     pieces/bishop.cpp
     pieces/rook.cpp
     pieces/queen.cpp
+    pieces/king.cpp
     # other source files...
 )

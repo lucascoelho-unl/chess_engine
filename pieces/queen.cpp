@@ -2,6 +2,7 @@
 #include "../moves/slide/straight.h"
 #include "../structure/bitboard.h"
 #include "../structure/square.h"
+#include "../utils.h"
 #include <sstream>
 #include <stdexcept>
 

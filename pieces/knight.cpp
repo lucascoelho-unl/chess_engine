@@ -10,37 +10,32 @@
 namespace chess_engine {
 namespace knight {
 
-constexpr bit::Bitboard calculate_all_knight_moves(int sq) {
-    bit::Bitboard b = 0ULL;
-    int rank = sq / 8;
-    int file = sq % 8;
+// Precompute knight moves for each square on the board
+constexpr std::array<bit::Bitboard, 64> calculate_knight_moves() {
+    std::array<bit::Bitboard, 64> moves = {0ULL};
 
     const int knight_moves[8][2] = {{-2, -1}, {-2, 1}, {-1, -2}, {-1, 2}, {1, -2}, {1, 2}, {2, -1}, {2, 1}};
-    for (const auto &move : knight_moves) {
-        int new_rank = rank + move[0];
-        int new_file = file + move[1];
-        if (new_rank >= 0 && new_rank < 8 && new_file >= 0 && new_file < 8) {
-            b |= 1ULL << (new_rank * 8 + new_file);
+
+    for (int sq = 0; sq < 64; ++sq) {
+        bit::Bitboard b = 0ULL;
+        int rank = sq / 8;
+        int file = sq % 8;
+
+        for (const auto &move : knight_moves) {
+            int new_rank = rank + move[0];
+            int new_file = file + move[1];
+            if (new_rank >= 0 && new_rank < 8 && new_file >= 0 && new_file < 8) {
+                b |= 1ULL << (new_rank * 8 + new_file);
+            }
         }
+        moves[sq] = b;
     }
-    return b;
+
+    return moves;
 }
 
-struct Knight_Moves {
-    std::array<bit::Bitboard, 64> moves;
-
-    constexpr Knight_Moves() : moves() {
-        for (int sq = 0; sq < 64; ++sq) {
-            moves[sq] = calculate_all_knight_moves(sq);
-        }
-    }
-};
-
-constexpr Knight_Moves knight_moves{};
-
-constexpr bit::Bitboard get_all_knight_moves(int square) {
-    return knight_moves.moves[square];
-}
+// Precompute knight moves once at compile-time
+constexpr std::array<bit::Bitboard, 64> knight_moves = calculate_knight_moves();
 
 bit::Bitboard get_moves(square::Square from, board::piece::Color color, const board::Board &board) {
     bit::Bitboard curr_knights = (color == board::piece::Color::WHITE) ? board.get_white_knights() : board.get_black_knights();
@@ -51,7 +46,7 @@ bit::Bitboard get_moves(square::Square from, board::piece::Color color, const bo
         throw std::invalid_argument(oss.str());
     }
 
-    bit::Bitboard all_knight_moves = get_all_knight_moves(from);
+    bit::Bitboard all_knight_moves = knight_moves[static_cast<int>(from)];
     bit::Bitboard valid_squares = (color == board::piece::Color::WHITE) ? ~board.get_white_pieces() : ~board.get_black_pieces();
 
     return all_knight_moves & valid_squares;

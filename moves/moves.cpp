@@ -1,5 +1,6 @@
 #include "moves.h"
 #include "../pieces/bishop.h"
+#include "../pieces/king.h"
 #include "../pieces/knight.h"
 #include "../pieces/pawn.h"
 #include "../pieces/queen.h"
@@ -36,6 +37,10 @@ bit::Bitboard get_bishop_moves(square::Square from, board::piece::Color color, c
 
 bit::Bitboard get_queen_moves(square::Square from, board::piece::Color color, const board::Board &board) {
     return queen::get_moves(from, color, board);
+}
+
+bit::Bitboard get_king_moves(square::Square from, board::piece::Color color, const board::Board &board) {
+    return king::get_moves(from, color, board);
 }
 
 } // namespace moves
