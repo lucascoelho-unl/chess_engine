@@ -9,7 +9,7 @@ using namespace chess_engine;
 
 int main() {
 
-    board::Board board = board::set_position("1b1r1b1r/8/8/8/8/8/8/8");
+    board::Board board = board::set_position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 
     bit::Bitboard all_moves = moves::generate_all_piece_moves(board::piece::Color::BLACK, board);
 

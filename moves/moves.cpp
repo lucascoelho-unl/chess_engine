@@ -111,7 +111,7 @@ bit::Bitboard get_piece_moves(int from, board::piece::Type type, board::piece::C
     bit::Bitboard current_piece_positions = board.get_pieces(type, color);
 
     if (!is_piece_at_position(from, current_piece_positions)) {
-        return 0ULL; // No need to throw exceptions, return invalid moves
+        return 0ULL;
     }
 
     // Switch case for respective piece move functions

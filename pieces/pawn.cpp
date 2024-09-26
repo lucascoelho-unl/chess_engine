@@ -14,9 +14,7 @@ bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board 
 
     // Check if pawn exists in this position
     if (!(curr_position & board.get_pawns(color))) {
-        std::ostringstream oss;
-        oss << "Pawn at position " << from << " does not exist";
-        throw std::invalid_argument(oss.str());
+        return 0ULL;
     }
 
     bit::Bitboard p1 = 0ULL; // move 1 forward

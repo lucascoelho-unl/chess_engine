@@ -10,9 +10,7 @@ namespace bishop {
 bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board) {
     bit::Bitboard bishop_positions = board.get_bishops(color);
     if (((1ULL << from) & bishop_positions) == 0) {
-        std::ostringstream oss;
-        oss << "Bishop at position " << static_cast<int>(from) << " does not exist";
-        throw std::invalid_argument(oss.str());
+        return 0ULL;
     }
 
     bit::Bitboard bishop_moves = moves::diagonal::get_moves(from, color, board);

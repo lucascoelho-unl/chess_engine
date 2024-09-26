@@ -47,9 +47,7 @@ bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board 
     bit::Bitboard curr_king = board.get_king(color);
 
     if (((1ULL << from) & curr_king) == 0) {
-        std::ostringstream oss;
-        oss << "King at position " << static_cast<int>(from) << " does not exist";
-        throw std::invalid_argument(oss.str());
+        return 0ULL;
     }
 
     bit::Bitboard available_king_moves = king_moves[static_cast<int>(from)];
