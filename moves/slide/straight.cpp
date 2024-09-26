@@ -59,9 +59,8 @@ bit::Bitboard compute_attack_for_occupancy(int sq, bit::Bitboard occupancy) {
         int target_square = (i * 8) + file;
         atk |= (1ULL << target_square);
         // If there is a piece on this square, stop
-        if (occupancy & (1ULL << target_square)) {
+        if (occupancy & (1ULL << target_square))
             break;
-        }
     }
 
     // South (Down the board)
@@ -69,9 +68,8 @@ bit::Bitboard compute_attack_for_occupancy(int sq, bit::Bitboard occupancy) {
         int target_square = (i * 8) + file;
         atk |= (1ULL << target_square);
         // If there is a piece on this square, stop
-        if (occupancy & (1ULL << target_square)) {
+        if (occupancy & (1ULL << target_square))
             break;
-        }
     }
 
     // East (Right across the board)
@@ -79,9 +77,8 @@ bit::Bitboard compute_attack_for_occupancy(int sq, bit::Bitboard occupancy) {
         int target_square = (rank * 8) + i;
         atk |= (1ULL << target_square);
         // If there is a piece on this square, stop
-        if (occupancy & (1ULL << target_square)) {
+        if (occupancy & (1ULL << target_square))
             break;
-        }
     }
 
     // West (Left across the board)
@@ -89,9 +86,8 @@ bit::Bitboard compute_attack_for_occupancy(int sq, bit::Bitboard occupancy) {
         int target_square = (rank * 8) + i;
         atk |= (1ULL << target_square);
         // If there is a piece on this square, stop
-        if (occupancy & (1ULL << target_square)) {
+        if (occupancy & (1ULL << target_square))
             break;
-        }
     }
 
     return atk;
@@ -235,14 +231,10 @@ std::vector<std::vector<bit::Bitboard>> precompute_attack_table() {
 
 std::vector<std::vector<bit::Bitboard>> attack_table = precompute_attack_table();
 
-// Function to get moves
 bit::Bitboard get_moves(square::Square from, board::piece::Color color, const board::Board &board) {
     bit::Bitboard relevant_occupancy = board.get_occupied_squares() & straight_moves[from];
     int index = magic_hash(relevant_occupancy, magic_numbers[from], shift_values[from]);
-
-    bit::Bitboard valid_moves = attack_table[from][index];
-
-    return valid_moves;
+    return attack_table[from][index];
 }
 
 } // namespace straight

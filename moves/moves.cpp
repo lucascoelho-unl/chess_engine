@@ -1,4 +1,5 @@
 #include "moves.h"
+#include "../pieces/bishop.h"
 #include "../pieces/knight.h"
 #include "../pieces/pawn.h"
 #include "../pieces/rook.h"
@@ -29,7 +30,7 @@ bit::Bitboard get_rook_moves(square::Square from, board::piece::Color color, con
 }
 
 bit::Bitboard get_bishop_moves(square::Square from, board::piece::Color color, const board::Board &board) {
-    return diagonal::get_moves(from, color, board);
+    return bishop::get_moves(from, color, board);
 }
 
 } // namespace moves

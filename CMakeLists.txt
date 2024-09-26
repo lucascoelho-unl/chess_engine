@@ -13,6 +13,7 @@ add_executable(chess_engine
     moves/slide/straight.cpp
     pieces/pawn.cpp
     pieces/knight.cpp
+    pieces/bishop.cpp
     pieces/rook.cpp
     # other source files...
 )

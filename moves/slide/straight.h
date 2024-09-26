@@ -4,7 +4,6 @@
 #include "../../structure/bitboard.h"
 #include "../../structure/board.h"
 #include "../../structure/square.h"
-#include <cstdint>
 
 namespace chess_engine {
 namespace moves {
