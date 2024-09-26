@@ -37,7 +37,7 @@ constexpr std::array<bit::Bitboard, 64> calculate_knight_moves() {
 // Precompute knight moves once at compile-time
 constexpr std::array<bit::Bitboard, 64> knight_moves = calculate_knight_moves();
 
-bit::Bitboard get_moves(square::Square from, board::piece::Color color, const board::Board &board) {
+bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board) {
     bit::Bitboard curr_knights = (color == board::piece::Color::WHITE) ? board.get_white_knights() : board.get_black_knights();
 
     if (((1ULL << from) & curr_knights) == 0) {

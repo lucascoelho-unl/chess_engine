@@ -218,7 +218,7 @@ std::vector<std::vector<bit::Bitboard>> precompute_attack_table() {
 
 std::vector<std::vector<bit::Bitboard>> attack_table = precompute_attack_table();
 
-bit::Bitboard get_moves(square::Square from, board::piece::Color color, const board::Board &board) {
+bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board) {
     bit::Bitboard relevant_occupancy = board.get_occupied_squares() & diagonal_moves[from];
     int index = magic_hash(relevant_occupancy, magic_numbers[from], shift_values[from]);
     return attack_table[from][index];

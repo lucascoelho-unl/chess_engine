@@ -8,7 +8,7 @@
 namespace chess_engine {
 namespace pawn {
 
-bit::Bitboard get_moves(square::Square from, board::piece::Color color, const board::Board &board) {
+bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board) {
     bit::Bitboard all_pawns = (color == board::piece::WHITE) ? board.get_white_pawns() : board.get_black_pawns();
     bit::Bitboard curr_position = ((1ULL & 1) << from) & all_pawns;
     bit::Bitboard valid_positions = board.get_empty_squares();

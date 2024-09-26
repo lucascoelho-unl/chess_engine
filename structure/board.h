@@ -139,7 +139,7 @@ class Board {
         return wr;
     }
 
-    inline const bit::Bitboard &get_white_queen() const {
+    inline const bit::Bitboard &get_white_queens() const {
         return wq;
     }
 
@@ -164,7 +164,7 @@ class Board {
         return br;
     }
 
-    inline const bit::Bitboard &get_black_queen() const {
+    inline const bit::Bitboard &get_black_queens() const {
         return bq;
     }
 

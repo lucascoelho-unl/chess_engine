@@ -43,7 +43,7 @@ constexpr std::array<bit::Bitboard, 64> calculate_king_moves() {
 // Precompute the king moves for all 64 squares
 constexpr std::array<bit::Bitboard, 64> king_moves = calculate_king_moves();
 
-bit::Bitboard get_moves(square::Square from, board::piece::Color color, const board::Board &board) {
+bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board) {
     bit::Bitboard curr_king = (color == board::piece::Color::WHITE) ? board.get_white_king() : board.get_black_king();
 
     if (((1ULL << from) & curr_king) == 0) {

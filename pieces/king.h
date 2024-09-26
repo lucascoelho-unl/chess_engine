@@ -8,7 +8,7 @@
 namespace chess_engine {
 namespace king {
 
-bit::Bitboard get_moves(square::Square from, board::piece::Color color, const board::Board &board);
+bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board);
 
 } // namespace king
 } // namespace chess_engine

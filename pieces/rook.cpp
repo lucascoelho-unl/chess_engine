@@ -7,7 +7,7 @@
 namespace chess_engine {
 namespace rook {
 
-bit::Bitboard get_moves(square::Square from, board::piece::Color color, const board::Board &board) {
+bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board) {
     bit::Bitboard rook_positions = (color == board::piece::Color::WHITE) ? board.get_white_rooks() : board.get_black_rooks();
     if (((1ULL << from) & rook_positions) == 0) {
         std::ostringstream oss;
