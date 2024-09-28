@@ -8,7 +8,7 @@
 namespace chess_engine {
 namespace rook {
 
-bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board);
+bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
 
 } // namespace rook
 } // namespace chess_engine

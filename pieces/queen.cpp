@@ -1,6 +1,7 @@
 #include "../moves/slide/diagonal.h"
 #include "../moves/slide/straight.h"
 #include "../structure/bitboard.h"
+#include "../structure/game_state.h"
 #include "../structure/square.h"
 #include "../utils.h"
 #include <sstream>
@@ -9,7 +10,7 @@
 namespace chess_engine {
 namespace queen {
 
-bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board) {
+bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
     bit::Bitboard queen_position = board.get_queens(color);
     if (((1ULL << from) & queen_position) == 0) {
         return 0ULL;

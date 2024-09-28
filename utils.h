@@ -17,5 +17,7 @@ using namespace chess_engine;
 
 void print_bitboard(bit::Bitboard b);
 
+board::piece::Color opposite_color(board::piece::Color c);
+
 } // namespace utils
 #endif

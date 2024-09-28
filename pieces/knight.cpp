@@ -1,5 +1,6 @@
 #include "../moves/moves.h"
 #include "../structure/bitboard.h"
+#include "../structure/game_state.h"
 #include "../structure/square.h"
 #include "../utils.h"
 #include <array>
@@ -37,7 +38,7 @@ constexpr std::array<bit::Bitboard, 64> calculate_knight_moves() {
 // Precompute knight moves once at compile-time
 constexpr std::array<bit::Bitboard, 64> knight_moves = calculate_knight_moves();
 
-bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board) {
+bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
     bit::Bitboard curr_knights = board.get_knights(color);
 
     if (((1ULL << from) & curr_knights) == 0) {

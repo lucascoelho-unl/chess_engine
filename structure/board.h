@@ -34,13 +34,15 @@ enum Type {
     BISHOP,
     ROOK,
     QUEEN,
-    KING
+    KING,
+    EMPTY
 };
 
 enum Color {
     WHITE,
     BLACK
 };
+
 } // namespace piece
 
 class Board {
@@ -70,6 +72,15 @@ class Board {
 
     inline bit::Bitboard get_empty_squares() const {
         return ~get_occupied_squares();
+    }
+
+    inline bool is_occupied(int sq) const {
+        return ((1ULL << sq) & get_occupied_squares());
+    }
+
+    inline bool is_occupied(square::Square square) const {
+        int sq = static_cast<int>(square);
+        return ((1ULL << sq) & get_occupied_squares());
     }
 
     // to_string() function for printing the board
@@ -140,23 +151,105 @@ class Board {
         return (color == piece::Color::WHITE) ? wk : bk;
     }
 
-    inline const bit::Bitboard &get_pieces(piece::Type type, piece::Color color) const {
+    inline piece::Type get_piece_type(int sq, piece::Color color) const {
+        bit::Bitboard mask = (1ULL << sq);
+
+        if (mask & get_pawns(color))
+            return piece::Type::PAWN;
+        if (mask & get_bishops(color))
+            return piece::Type::BISHOP;
+        if (mask & get_knights(color))
+            return piece::Type::KNIGHT;
+        if (mask & get_rooks(color))
+            return piece::Type::ROOK;
+        if (mask & get_queens(color))
+            return piece::Type::QUEEN;
+        if (mask & get_king(color))
+            return piece::Type::KING;
+        return piece::Type::EMPTY;
+    }
+
+    inline bit::Bitboard &get_pieces(piece::Type type, piece::Color color) {
         switch (type) {
         case piece::PAWN:
-            return get_pawns(color);
+            return (color == piece::Color::WHITE) ? wp : bp;
         case piece::KNIGHT:
-            return get_knights(color);
+            return (color == piece::Color::WHITE) ? wn : bn;
         case piece::BISHOP:
-            return get_bishops(color);
+            return (color == piece::Color::WHITE) ? wb : bb;
         case piece::ROOK:
-            return get_rooks(color);
+            return (color == piece::Color::WHITE) ? wr : br;
         case piece::QUEEN:
-            return get_queens(color);
+            return (color == piece::Color::WHITE) ? wq : bq;
         case piece::KING:
-            return get_king(color);
+            return (color == piece::Color::WHITE) ? wk : bk;
         default:
             throw std::invalid_argument("Invalid piece type");
         }
+    }
+
+    // Const version for read-only access
+    inline const bit::Bitboard &get_pieces(piece::Type type, piece::Color color) const {
+        switch (type) {
+        case piece::PAWN:
+            return (color == piece::Color::WHITE) ? wp : bp;
+        case piece::KNIGHT:
+            return (color == piece::Color::WHITE) ? wn : bn;
+        case piece::BISHOP:
+            return (color == piece::Color::WHITE) ? wb : bb;
+        case piece::ROOK:
+            return (color == piece::Color::WHITE) ? wr : br;
+        case piece::QUEEN:
+            return (color == piece::Color::WHITE) ? wq : bq;
+        case piece::KING:
+            return (color == piece::Color::WHITE) ? wk : bk;
+        default:
+            throw std::invalid_argument("Invalid piece type");
+        }
+    }
+
+    bool is_capture(int to, piece::Color color) const {
+        bit::Bitboard to_mask = 1ULL << to;
+        if (color == piece::Color::WHITE) {
+            return get_black_pieces() & to_mask; // Check if there is a black piece on the 'to' square
+        } else {
+            return get_white_pieces() & to_mask; // Check if there is a white piece on the 'to' square
+        }
+    }
+
+    void remove_piece(int square, piece::Color color) {
+        bit::Bitboard mask = ~(1ULL << square); // Mask to unset the piece at the given square
+        // clang-format off
+        if (color == piece::Color::WHITE) {
+            if (wp & (1ULL << square)) wp &= mask;
+            else if (wb & (1ULL << square)) wb &= mask;
+            else if (wn & (1ULL << square)) wn &= mask;
+            else if (wr & (1ULL << square)) wr &= mask;
+            else if (wq & (1ULL << square)) wq &= mask;
+            else if (wk & (1ULL << square)) wk &= mask;
+        } else {
+            if (bp & (1ULL << square)) bp &= mask;
+            else if (bb & (1ULL << square)) bb &= mask;
+            else if (bn & (1ULL << square)) bn &= mask;
+            else if (br & (1ULL << square)) br &= mask;
+            else if (bq & (1ULL << square)) bq &= mask;
+            else if (bk & (1ULL << square)) bk &= mask;
+        }
+        // clang-format on
+    }
+
+    bool move_piece(int from, int to, piece::Type piece_type, piece::Color color) {
+        bit::Bitboard &piece_bitboard = get_pieces(piece_type, color);
+        bit::Bitboard from_mask = 1ULL << from;
+        bit::Bitboard to_mask = 1ULL << to;
+
+        // Remove the piece from the 'from' square
+        piece_bitboard &= ~from_mask;
+
+        // Add the piece to the 'to' square
+        piece_bitboard |= to_mask;
+
+        return true;
     }
 };
 

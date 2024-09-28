@@ -23,4 +23,8 @@ void print_bitboard(bit::Bitboard b) {
     std::cout << std::endl;
 }
 
+board::piece::Color opposite_color(board::piece::Color c) {
+    return (c == board::piece::Color::WHITE) ? board::piece::Color::BLACK : board::piece::Color::WHITE;
+}
+
 } // namespace utils

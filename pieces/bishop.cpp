@@ -1,5 +1,6 @@
 #include "../moves/slide/diagonal.h"
 #include "../structure/bitboard.h"
+#include "../structure/game_state.h"
 #include "../structure/square.h"
 #include <sstream>
 #include <stdexcept>
@@ -7,7 +8,7 @@
 namespace chess_engine {
 namespace bishop {
 
-bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board) {
+bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
     bit::Bitboard bishop_positions = board.get_bishops(color);
     if (((1ULL << from) & bishop_positions) == 0) {
         return 0ULL;
