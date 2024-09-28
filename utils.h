@@ -1,6 +1,7 @@
 #ifndef CHESS_ENGINE_UTILS_H
 #define CHESS_ENGINE_UTILS_H
 
+#include "../enums.h"
 #include "moves/moves.h"
 #include "structure/bitboard.h"
 #include "structure/board.h"
@@ -17,7 +18,7 @@ using namespace chess_engine;
 
 void print_bitboard(bit::Bitboard b);
 
-board::piece::Color opposite_color(board::piece::Color c);
+piece::Color opposite_color(piece::Color c);
 
 } // namespace utils
 #endif

@@ -2,6 +2,7 @@
 #include "../structure/bitboard.h"
 #include "../structure/game_state.h"
 #include "../structure/square.h"
+#include "../enums.h"
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -9,7 +10,7 @@
 namespace chess_engine {
 namespace pawn {
 
-bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
     bit::Bitboard curr_position = 1ULL << from;
     bit::Bitboard valid_positions = board.get_empty_squares();
     bit::Bitboard moves = 0ULL;
@@ -20,7 +21,7 @@ bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board 
     }
 
     // Regular forward moves (1 square or 2 squares)
-    if (color == board::piece::WHITE) {
+    if (color == piece::WHITE) {
         bit::Bitboard p1 = (curr_position << 8) & valid_positions; // Move 1 square forward
         if (p1 != 0) {
             moves |= p1;
@@ -39,8 +40,8 @@ bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board 
     }
 
     // Captures
-    bit::Bitboard enemy_pieces = (color == board::piece::WHITE) ? board.get_black_pieces() : board.get_white_pieces();
-    if (color == board::piece::WHITE) {
+    bit::Bitboard enemy_pieces = (color == piece::WHITE) ? board.get_black_pieces() : board.get_white_pieces();
+    if (color == piece::WHITE) {
         // Capture diagonally left and right
         moves |= ((curr_position & ~board::a_file) << 7) & enemy_pieces; // Capture to the left
         moves |= ((curr_position & ~board::h_file) << 9) & enemy_pieces; // Capture to the right
@@ -52,7 +53,7 @@ bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board 
 
     // En passant capture
     if (game_state.en_passant_square != -1) {
-        if (color == board::piece::WHITE) {
+        if (color == piece::WHITE) {
             if (from / 8 == 4) { // White pawns must be on rank 5 for en passant
                 bit::Bitboard left_capture = (curr_position & ~board::a_file) << 7;
                 bit::Bitboard right_capture = (curr_position & ~board::h_file) << 9;

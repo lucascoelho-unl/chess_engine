@@ -1,3 +1,4 @@
+#include "enums.h"
 #include "moves/moves.h"
 #include "structure/bitboard.h"
 #include "structure/board.h"
@@ -27,16 +28,16 @@ int main() {
     int to = static_cast<int>(to_square);
 
     // Determine the piece type
-    board::piece::Type type = board::piece::Type::PAWN;
+    piece::Type type = piece::Type::PAWN;
 
     // Determine color (White in this case)
-    board::piece::Color color = board::piece::Color::BLACK;
+    piece::Color color = piece::Color::BLACK;
 
     // Create the move
     moves::Move move(from, to, type, color);
 
     // Make the move
-    game_state.make_move(from, to, type, color, moves::Move_Type::NORMAL, board::piece::QUEEN);
+    game_state.make_move(from, to, type, color, moves::Move_Type::NORMAL, piece::QUEEN);
 
     // Display updated board
     std::cout << "Board after move:" << std::endl;

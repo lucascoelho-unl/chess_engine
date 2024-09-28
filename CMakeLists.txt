@@ -18,6 +18,7 @@ add_executable(chess_engine
     utils.cpp
     structure/board.cpp
     structure/game_state.cpp
+    structure/square.cpp
     moves/moves.cpp
     moves/slide/diagonal.cpp
     moves/slide/straight.cpp

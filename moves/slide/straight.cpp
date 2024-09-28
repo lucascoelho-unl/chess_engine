@@ -1,4 +1,5 @@
 #include "straight.h"
+#include "../../enums.h"
 #include "../../structure/bitboard.h"
 #include "../../structure/board.h"
 #include "../../structure/square.h"
@@ -231,7 +232,7 @@ std::vector<std::vector<bit::Bitboard>> precompute_attack_table() {
 
 std::vector<std::vector<bit::Bitboard>> attack_table = precompute_attack_table();
 
-bit::Bitboard get_moves(int from, board::piece::Color color, const board::Board &board) {
+bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board) {
     bit::Bitboard relevant_occupancy = board.get_occupied_squares() & straight_moves[from];
     int index = magic_hash(relevant_occupancy, magic_numbers[from], shift_values[from]);
     return attack_table[from][index];

@@ -1,6 +1,7 @@
 #ifndef CHESS_ENGINE_BITBOARD_H
 #define CHESS_ENGINE_BITBOARD_H
 
+#include "../enums.h"
 #include "square.h"
 #include <cstdint>
 #include <iostream>

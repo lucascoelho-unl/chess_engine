@@ -1,7 +1,7 @@
 #ifndef CHESS_ENGINE_GAME_STATE_H
 #define CHESS_ENGINE_GAME_STATE_H
 
-#include "../moves/move_type.h"
+#include "../enums.h"
 #include "../moves/moves.h"
 #include "../utils.h"
 #include "bitboard.h"
@@ -16,7 +16,7 @@ namespace game_state {
 class Game_State {
   public:
     board::Board current_board;  // The current state of the chessboard
-    board::piece::Color turn;    // Whose turn it is (White or Black)
+    piece::Color turn;           // Whose turn it is (White or Black)
     bool white_castle_kingside;  // White's kingside castling rights
     bool white_castle_queenside; // White's queenside castling rights
     bool black_castle_kingside;  // Black's kingside castling rights
@@ -30,18 +30,18 @@ class Game_State {
 
     Game_State() = default; // Default constructor
 
-    Game_State(const board::Board &board, board::piece::Color turn, bool w_k_castle, bool w_q_castle,
+    Game_State(const board::Board &board, piece::Color turn, bool w_k_castle, bool w_q_castle,
                bool b_k_castle, bool b_q_castle, int en_passant, int halfmove, int fullmove);
 
-    bool is_square_attacked(int sq, board::piece::Color color) const;
+    bool is_square_attacked(int sq, piece::Color color) const;
     void save_state();
     void restore_previous_state();
     void switch_turn();
     void update_castling_rights(int from, int to);
     void update_en_passant(int from, int to);
-    bool is_castling_valid(int from, int to, board::piece::Color color);
+    bool is_castling_valid(int from, int to, piece::Color color);
 
-    bool make_move(int from, int to, board::piece::Type piece_type, board::piece::Color color, moves::Move_Type move_type, board::piece::Type promotion);
+    bool make_move(int from, int to, piece::Type piece_type, piece::Color color, moves::Move_Type move_type, piece::Type promotion);
 
     const board::Board &get_board() const { return current_board; }
 };

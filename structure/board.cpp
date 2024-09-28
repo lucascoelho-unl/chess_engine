@@ -1,4 +1,5 @@
 #include "board.h"
+#include "../enums.h"
 #include "bitboard.h"
 #include <iostream>
 

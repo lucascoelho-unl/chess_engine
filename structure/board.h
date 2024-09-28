@@ -1,6 +1,7 @@
 #ifndef CHESS_ENGINE_BOARD_H
 #define CHESS_ENGINE_BOARD_H
 
+#include "../enums.h"
 #include "bitboard.h"
 #include <string>
 
@@ -26,24 +27,6 @@ extern bit::Bitboard rank_5;
 extern bit::Bitboard rank_6;
 extern bit::Bitboard rank_7;
 extern bit::Bitboard rank_8;
-
-namespace piece {
-enum Type {
-    PAWN,
-    KNIGHT,
-    BISHOP,
-    ROOK,
-    QUEEN,
-    KING,
-    EMPTY
-};
-
-enum Color {
-    WHITE,
-    BLACK
-};
-
-} // namespace piece
 
 class Board {
   private:
