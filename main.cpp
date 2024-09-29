@@ -37,7 +37,7 @@ int main() {
     moves::Move move(from, to, type, color);
 
     // Make the move
-    game_state.make_move(from, to, type, color, moves::Move_Type::NORMAL, piece::QUEEN);
+    game_state.make_move(from, to, type, color, moves::Type::NORMAL, piece::QUEEN);
 
     // Display updated board
     std::cout << "Board after move:" << std::endl;

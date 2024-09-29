@@ -41,7 +41,7 @@ class Game_State {
     void update_en_passant(int from, int to);
     bool is_castling_valid(int from, int to, piece::Color color);
 
-    bool make_move(int from, int to, piece::Type piece_type, piece::Color color, moves::Move_Type move_type, piece::Type promotion);
+    bool make_move(int from, int to, piece::Type piece_type, piece::Color color, moves::Type move_type, piece::Type promotion);
 
     const board::Board &get_board() const { return current_board; }
 };

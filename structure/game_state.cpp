@@ -123,7 +123,7 @@ bool Game_State::is_castling_valid(int from, int to, piece::Color color) {
     return false; // Invalid castling move
 }
 
-bool Game_State::make_move(int from, int to, piece::Type piece_type, piece::Color color, moves::Move_Type move_type, piece::Type promotion) {
+bool Game_State::make_move(int from, int to, piece::Type piece_type, piece::Color color, moves::Type move_type, piece::Type promotion) {
     // Get the bitboard for the moving piece
     bit::Bitboard &piece_bitboard = current_board.get_pieces(piece_type, turn);
     bit::Bitboard from_mask = 1ULL << from;

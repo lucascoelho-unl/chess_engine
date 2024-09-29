@@ -22,10 +22,10 @@ struct Move {
     int to;
     piece::Type piece_type;
     piece::Color color;
-    moves::Move_Type move_type;
+    moves::Type move_type;
     piece::Type promotion;
 
-    Move(int from, int to, piece::Type piece_type, piece::Color color, moves::Move_Type move_type = moves::Move_Type::NORMAL, piece::Type promotion = piece::Type::EMPTY)
+    Move(int from, int to, piece::Type piece_type, piece::Color color, moves::Type move_type = moves::Type::NORMAL, piece::Type promotion = piece::Type::EMPTY)
         : from(from), to(to), piece_type(piece_type), color(color), move_type(move_type), promotion(promotion) {}
 };
 

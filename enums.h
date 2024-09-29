@@ -21,7 +21,7 @@ enum Color {
 } // namespace piece
 
 namespace moves {
-enum Move_Type {
+enum Type {
     NORMAL = 0,
     CAPTURE = 1,
     EN_PASSANT = 2,
