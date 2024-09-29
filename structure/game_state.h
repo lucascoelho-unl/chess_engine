@@ -52,6 +52,7 @@ class Game_State {
     void update_castling_rights(int from, int to);
     void update_en_passant(int from, int to);
     bool is_castling_valid(int from, int to, piece::Color color);
+    bool is_in_check(piece::Color color);
 
     bool make_move(int from, int to, piece::Type piece_type, piece::Color color, moves::Type move_type, piece::Type promotion);
     bool unmake_move();

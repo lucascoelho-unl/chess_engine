@@ -116,28 +116,13 @@ Implemented methods to get varous bitboards from the board class.
 ## FEN notation
 Implemented a method to read FEN notation into the board and create a new board with the pieces in the correct position based on the FEN notation. 
 
-## In-development
-Currently developing pieces movement bitboards. For each piece, I'll implement a function that returns a bitboard of all valid moves. The structure will be lioke below: 
-// Get moves from a specific square for a piece of the specified color
-Bitboard get_pawn_moves(Square from, Color color, const Board &board);
-Bitboard get_knight_moves(Square from, Color color, const Board &board);
-Bitboard get_bishop_moves(Square from, Color color, const Board &board);
-Bitboard get_rook_moves(Square from, Color color, const Board &board);
-Bitboard get_queen_moves(Square from, Color color, const Board &board);
-Bitboard get_king_moves(Square from, Color color, const Board &board);
-// Get all possible moves for the specified color
-Bitboard get_all_pawn_moves(Color color, const Board &board);
-Bitboard get_all_knight_moves(Color color, const Board &board);
-Bitboard get_all_bishop_moves(Color color, const Board &board);
-Bitboard get_all_rook_moves(Color color, const Board &board);
-Bitboard get_all_queen_moves(Color color, const Board &board);
-Bitboard get_all_king_moves(Color color, const Board &board);
-// General function to get moves for any piece type
-Bitboard get_piece_moves(Piece_Type piece, Square from, Color color, Bitboard occupancy);
-// Generate all valid moves for the specified color
-std::vector<Move> generate_all_valid_moves(Color color);
+## Valid Moves Generation
+Implemented a function for each piece to generate a bitboard with all valid moves based on the board current state. Generates rook, bishop, and queen moves with magic number hahsing, knight moves with pre-computed bitboards, and pawn and king moves with normal generation. King and pawn moves have implemented the castling and en-passant move. 
 
-I'd love your help for instructions, next steps, how to proceed when I finish each step, and also with advices on how the project structure should be, and all that. 
+## Game State Representation
+Implemented a game state class that holds all important information for the game of chess. It holds the board, en-passant square, castling rights, and total move counts.
+
+I'd love your help for instructions, next steps, how to proceed when I finish each step, and also with advices on how the project structure should be, and all that. I'll attatch my current files on the next few messages, and when I'm done, I'll send you a message asking for the 
 
 I hope we have an amazing project together. 
 

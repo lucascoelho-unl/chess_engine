@@ -133,6 +133,16 @@ bool Game_State::is_castling_valid(int from, int to, piece::Color color) {
     return false; // Invalid castling move
 }
 
+bool Game_State::is_in_check(piece::Color color) {
+    bit::Bitboard opposite_team_attacks = moves::generate_all_piece_moves(utils::opposite_color(color), current_board, *this);
+    bit::Bitboard current_king_position = current_board.get_king(color);
+
+    if (current_king_position & opposite_team_attacks) {
+        return true;
+    }
+    return false;
+}
+
 bool Game_State::make_move(int from, int to, piece::Type piece_type, piece::Color color, moves::Type move_type, piece::Type promotion) {
     // Save the current state before making the move
     save_state();
@@ -227,6 +237,12 @@ bool Game_State::make_move(int from, int to, piece::Type piece_type, piece::Colo
     // Handle normal moves
     if (move_type == moves::Type::NORMAL) {
         current_board.move_piece(from, to, piece_type, turn); // Move the piece
+    }
+
+    // Check if king is left in check
+    if (is_in_check(color)) {
+        restore_previous_state();
+        return false;
     }
 
     // Update castling rights based on rook/king moves
