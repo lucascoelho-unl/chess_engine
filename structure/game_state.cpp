@@ -23,6 +23,16 @@ bool Game_State::is_square_attacked(int sq, piece::Color color) const {
 }
 
 void Game_State::save_state() {
+    if (!previous_states.empty()) {
+        // Compare current state with the top of the stack (the last saved state)
+        const Game_State &last_state = previous_states.top();
+        if (*this == last_state) {
+            // If the current state is identical to the last saved state, do not save it
+            return;
+        }
+    }
+
+    // Save the current state if it differs from the last one
     previous_states.push(*this);
 }
 
@@ -124,24 +134,34 @@ bool Game_State::is_castling_valid(int from, int to, piece::Color color) {
 }
 
 bool Game_State::make_move(int from, int to, piece::Type piece_type, piece::Color color, moves::Type move_type, piece::Type promotion) {
+    // Save the current state before making the move
+    save_state();
+
     // Get the bitboard for the moving piece
     bit::Bitboard &piece_bitboard = current_board.get_pieces(piece_type, turn);
     bit::Bitboard from_mask = 1ULL << from;
     bit::Bitboard to_mask = 1ULL << to;
+    bit::Bitboard valid_moves = moves::get_piece_moves(from, piece_type, color, current_board, *this);
+
+    if (!(valid_moves & to_mask)) {
+        std::cout << "Invalid move! Not in piece valid moves generated." << std::endl;
+        return false;
+    }
 
     // Wrong color moving
     if (color != turn) {
-        std::cout << color << turn << std::endl;
+        std::cout << "Invalid move! Not this color's turn." << std::endl;
         return false;
     }
 
     // Check if there's actually a piece of the given type on the 'from' square
     if (!(piece_bitboard & from_mask)) {
+        std::cout << "Invalid move! No piece of type on square." << std::endl;
         return false; // Invalid move, no piece to move
     }
 
     // Handle castling
-    if (move_type == 2) {
+    if (move_type == moves::Type::CASTLING) {
         // Validate castling
         if (!is_castling_valid(from, to, turn)) {
             std::cout << "Castling move is invalid!" << std::endl;
@@ -165,7 +185,7 @@ bool Game_State::make_move(int from, int to, piece::Type piece_type, piece::Colo
     }
 
     // Handle en passant
-    if (move_type == 1) {
+    if (move_type == moves::Type::EN_PASSANT) {
         // Ensure the piece is a pawn and positioned correctly
         if (piece_type == piece::PAWN) {
             if (to == en_passant_square) {
@@ -182,17 +202,12 @@ bool Game_State::make_move(int from, int to, piece::Type piece_type, piece::Colo
                 }
             }
         }
+        std::cout << "Invalid move! Invalid en-passant." << std::endl;
         return false;
     }
 
-    // Check if the move is in the piece valid moves bitboard.
-    // Only perform check here because castling and en-passant are not in the valid moves bitboard.
-    bit::Bitboard valid_moves = moves::get_piece_moves(from, piece_type, turn, current_board, *this);
-    if (!(to_mask & valid_moves))
-        return false;
-
     // Handle promotion
-    if (move_type == 3) {
+    if (move_type == moves::Type::PROMOTION) {
         current_board.move_piece(from, to, piece_type, turn); // Move the pawn
         bit::Bitboard &new_piece_bitboard = current_board.get_pieces(promotion, turn);
         piece_bitboard &= ~to_mask;    // Remove the pawn
@@ -200,15 +215,17 @@ bool Game_State::make_move(int from, int to, piece::Type piece_type, piece::Colo
     }
 
     // Handle captures
-    if (move_type == 4) {
-        if (!current_board.is_capture(to, turn))
+    if (move_type == moves::Type::CAPTURE) {
+        if (!current_board.is_capture(to, turn)) {
+            std::cout << "Invalid move! Not a capture." << std::endl;
             return false;
+        }
         current_board.remove_piece(to, (turn == piece::Color::WHITE) ? piece::Color::BLACK : piece::Color::WHITE);
         current_board.move_piece(from, to, piece_type, turn);
     }
 
     // Handle normal moves
-    if (move_type == 0) {
+    if (move_type == moves::Type::NORMAL) {
         current_board.move_piece(from, to, piece_type, turn); // Move the piece
     }
 
@@ -222,6 +239,17 @@ bool Game_State::make_move(int from, int to, piece::Type piece_type, piece::Colo
     switch_turn();
 
     return true;
+}
+
+bool Game_State::unmake_move() {
+    // Restore the previous game state using the stack of saved states
+    if (!previous_states.empty()) {
+        restore_previous_state();
+        return true; // Successfully restored the previous state
+    }
+
+    // If there are no previous states, return false
+    return false;
 }
 
 Game_State set_game_state(const std::string &fen) {

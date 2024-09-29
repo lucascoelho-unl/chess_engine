@@ -1,9 +1,9 @@
+#include "../enums.h"
 #include "../moves/moves.h"
 #include "../structure/bitboard.h"
 #include "../structure/game_state.h"
 #include "../structure/square.h"
 #include "../utils.h"
-#include "../enums.h"
 #include <array>
 #include <sstream>
 #include <stdexcept>
@@ -71,7 +71,7 @@ bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board,
     }
 
     // Handle castling
-    if (color == piece::Color::WHITE) {
+    if (color == piece::Color::WHITE && from == 5) {
         if (game_state.white_castle_kingside &&
             !game_state.is_square_attacked(square::E1, piece::Color::BLACK) &&
             !game_state.is_square_attacked(square::F1, piece::Color::BLACK) &&
@@ -87,7 +87,7 @@ bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board,
             !board.is_occupied(square::B1)) {
             safe_moves |= (1ULL << square::C1); // Queenside castling
         }
-    } else {
+    } else if (color == piece::Color::BLACK && from == 60) {
         if (game_state.black_castle_kingside &&
             !game_state.is_square_attacked(square::E8, piece::Color::WHITE) &&
             !game_state.is_square_attacked(square::F8, piece::Color::WHITE) &&
@@ -105,7 +105,6 @@ bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board,
             safe_moves |= (1ULL << square::C8); // Queenside castling
         }
     }
-
     return safe_moves;
 }
 

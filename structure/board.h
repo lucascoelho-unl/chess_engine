@@ -39,6 +39,21 @@ class Board {
         : wp(wp), wb(wb), wn(wn), wr(wr), wq(wq), wk(wk),
           bp(bp), bb(bb), bn(bn), br(br), bq(bq), bk(bk) {}
 
+    bool operator==(const Board &other) const {
+        return wp == other.wp &&
+               wb == other.wb &&
+               wn == other.wn &&
+               wr == other.wr &&
+               wq == other.wq &&
+               wk == other.wk &&
+               bp == other.bp &&
+               bb == other.bb &&
+               bn == other.bn &&
+               br == other.br &&
+               bq == other.bq &&
+               bk == other.bk;
+    }
+
     // Combined white or black pieces
     inline bit::Bitboard get_white_pieces() const {
         return (wp | wb | wn | wr | wq | wk);
