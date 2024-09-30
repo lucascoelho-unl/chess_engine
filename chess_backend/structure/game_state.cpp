@@ -17,8 +17,30 @@ Game_State::Game_State(const board::Board &board, piece::Color turn, bool w_k_ca
       black_castle_queenside(b_q_castle), en_passant_square(en_passant),
       halfmove_clock(halfmove), fullmove_number(fullmove) {}
 
-// TODO: implement
 bool Game_State::is_game_over() {
+    // Check for 50-move rule (halfmove_clock is reset after captures and pawn moves)
+    if (halfmove_clock >= 100) {
+        std::cout << "50-move rule: Game is a draw!" << std::endl;
+        return true;
+    }
+
+    // Check if the current player is in check
+    bool in_check = is_in_check(turn);
+
+    // Generate all possible moves for the current player
+    std::vector<moves::Move> possible_moves = moves::generate_legal_moves(turn, *this);
+
+    if (possible_moves.empty()) {
+        if (in_check) {
+            // Current player is in check and has no legal moves -> checkmate
+            std::cout << "Checkmate! " << (turn == piece::WHITE ? "Black" : "White") << " wins!" << std::endl;
+        } else {
+            // No legal moves but not in check -> stalemate
+            std::cout << "Stalemate: Game is a draw!" << std::endl;
+        }
+        return true;
+    }
+
     return false;
 }
 
@@ -259,9 +281,18 @@ bool Game_State::make_move(moves::Move move) {
     // Check if the king is left in check
     if (is_in_check(color)) {
         std::cout << "Move leaves the king in check! Undoing move." << std::endl;
+        move_history.push_back(rev_move);
         unmake_move();
         return false;
     }
+
+    if (move_type == moves::Type::CAPTURE || piece_type == piece::Type::PAWN) {
+        halfmove_clock = 0;
+    } else {
+        ++halfmove_clock;
+    }
+
+    ++fullmove_number;
 
     // Update castling rights and en passant
     update_castling_rights(from, to);

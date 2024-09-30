@@ -113,7 +113,7 @@ int main() {
 
         // AI's turn (engine finds the best move)
         std::cout << "Engine's turn...\n";
-        moves::Move best_move = search::find_best_move(3, piece::Color::BLACK, game_state); // Assuming depth = 3 for search
+        moves::Move best_move = search::find_best_move(5, piece::Color::BLACK, game_state); // Assuming depth = 3 for search
 
         std::string from_square_str = square::int_position_to_string(best_move.from);
         std::string to_square_str = square::int_position_to_string(best_move.to);
