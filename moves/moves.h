@@ -46,10 +46,16 @@ bit::Bitboard get_all_queen_moves(piece::Color color, const board::Board &board,
 bit::Bitboard get_all_king_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
 
 // General function to get moves for any piece type
-bit::Bitboard get_piece_moves(int from, piece::Type piece, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
+bit::Bitboard get_piece_moves(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
 
 // Generate all valid moves for the specified color
-bit::Bitboard generate_all_piece_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
+bit::Bitboard generate_all_piece_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state, bool exclude_king = false);
+
+// Method of generating a list of valid moves for a piece given its move bitboard.
+std::vector<Move> extract_moves_from_bitboard(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
+
+// Extract all possible moves for all pieces and returns a list of them.
+std::vector<Move> extract_all_possible_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
 
 } // namespace moves
 } // namespace chess_engine

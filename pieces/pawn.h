@@ -12,6 +12,8 @@ namespace pawn {
 
 bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
 
+bit::Bitboard get_possible_attacks(piece::Color color, bit::Bitboard pawns);
+
 } // namespace pawn
 } // namespace chess_engine
 

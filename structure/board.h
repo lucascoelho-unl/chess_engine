@@ -4,6 +4,7 @@
 #include "../enums.h"
 #include "bitboard.h"
 #include <string>
+#include <vector>
 
 namespace chess_engine {
 namespace board {
@@ -206,6 +207,8 @@ class Board {
         }
     }
 
+    Board copy() const;
+
     bool is_capture(int to, piece::Color color) const {
         bit::Bitboard to_mask = 1ULL << to;
         if (color == piece::Color::WHITE) {
@@ -249,6 +252,8 @@ class Board {
 
         return true;
     }
+
+    std::vector<int> get_squares_with_piece(piece::Type type, piece::Color color) const;
 };
 
 Board set_position(std::string fen);

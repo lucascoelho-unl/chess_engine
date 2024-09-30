@@ -52,5 +52,11 @@ Square string_to_square(const std::string &square_str) {
     return file_rank_to_square(file_idx, rank_idx);
 }
 
+std::string int_position_to_string(int square) {
+    char file = 'a' + (square % 8); // Calculate file (a-h)
+    char rank = '1' + (square / 8); // Calculate rank (1-8)
+    return std::string(1, file) + rank;
+}
+
 } // namespace square
 } // namespace chess_engine

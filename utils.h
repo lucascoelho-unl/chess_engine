@@ -20,5 +20,9 @@ void print_bitboard(bit::Bitboard b);
 
 piece::Color opposite_color(piece::Color c);
 
+std::string piece_type_to_string(piece::Type type);
+
+std::string piece_color_to_string(piece::Color color);
+
 } // namespace utils
 #endif

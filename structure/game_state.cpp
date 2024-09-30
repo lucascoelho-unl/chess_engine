@@ -1,6 +1,8 @@
 #include "game_state.h"
 #include "../enums.h"
 #include "../moves/moves.h"
+#include "../pieces/king.h"
+#include <iostream>
 #include <sstream>
 
 namespace chess_engine {
@@ -15,10 +17,19 @@ Game_State::Game_State(const board::Board &board, piece::Color turn, bool w_k_ca
 
 bool Game_State::is_square_attacked(int sq, piece::Color color) const {
     bit::Bitboard attacked_squares = 0ULL;
-    if (color == piece::Color::WHITE)
-        attacked_squares |= moves::generate_all_piece_moves(piece::Color::WHITE, current_board, *this);
-    if (color == piece::Color::BLACK)
-        attacked_squares |= moves::generate_all_piece_moves(piece::Color::BLACK, current_board, *this);
+
+    // Generate moves for all pieces except the king
+    attacked_squares |= moves::generate_all_piece_moves(utils::opposite_color(color), current_board, *this, true);
+
+    // Check if the opponent's king attacks the square manually
+    bit::Bitboard opponent_king = current_board.get_king(utils::opposite_color(color));
+    int king_square = __builtin_ffsll(opponent_king) - 1;
+    bit::Bitboard king_moves = king::king_moves[king_square];
+
+    if (king_moves & (1ULL << sq)) {
+        return true; // The square is attacked by the opponent's king
+    }
+
     return (((1ULL << sq) & attacked_squares) != 0);
 }
 
@@ -93,7 +104,7 @@ void Game_State::update_en_passant(int from, int to) {
     }
 }
 
-bool Game_State::is_castling_valid(int from, int to, piece::Color color) {
+bool Game_State::is_castling_valid(int from, int to, piece::Color color) const {
     // Ensure that the move is either kingside or queenside castling
     if (!(to == square::G1 || to == square::C1 || to == square::G8 || to == square::C8)) {
         return false;
@@ -110,24 +121,24 @@ bool Game_State::is_castling_valid(int from, int to, piece::Color color) {
     // Check specific castling conditions
     if (to == square::G1 && white_castle_kingside) {
         return !current_board.is_occupied(square::F1) && !current_board.is_occupied(square::G1) &&
-               !is_square_attacked(square::E1, piece::BLACK) &&
-               !is_square_attacked(square::F1, piece::BLACK) &&
-               !is_square_attacked(square::G1, piece::BLACK);
+               !is_square_attacked(square::E1, piece::WHITE) &&
+               !is_square_attacked(square::F1, piece::WHITE) &&
+               !is_square_attacked(square::G1, piece::WHITE);
     } else if (to == square::C1 && white_castle_queenside) {
         return !current_board.is_occupied(square::B1) && !current_board.is_occupied(square::C1) && !current_board.is_occupied(square::D1) &&
-               !is_square_attacked(square::E1, piece::BLACK) &&
-               !is_square_attacked(square::D1, piece::BLACK) &&
-               !is_square_attacked(square::C1, piece::BLACK);
+               !is_square_attacked(square::E1, piece::WHITE) &&
+               !is_square_attacked(square::D1, piece::WHITE) &&
+               !is_square_attacked(square::C1, piece::WHITE);
     } else if (to == square::G8 && black_castle_kingside) {
         return !current_board.is_occupied(square::F8) && !current_board.is_occupied(square::G8) &&
-               !is_square_attacked(square::E8, piece::WHITE) &&
-               !is_square_attacked(square::F8, piece::WHITE) &&
-               !is_square_attacked(square::G8, piece::WHITE);
+               !is_square_attacked(square::E8, piece::BLACK) &&
+               !is_square_attacked(square::F8, piece::BLACK) &&
+               !is_square_attacked(square::G8, piece::BLACK);
     } else if (to == square::C8 && black_castle_queenside) {
         return !current_board.is_occupied(square::B8) && !current_board.is_occupied(square::C8) && !current_board.is_occupied(square::D8) &&
-               !is_square_attacked(square::E8, piece::WHITE) &&
-               !is_square_attacked(square::D8, piece::WHITE) &&
-               !is_square_attacked(square::C8, piece::WHITE);
+               !is_square_attacked(square::E8, piece::BLACK) &&
+               !is_square_attacked(square::D8, piece::BLACK) &&
+               !is_square_attacked(square::C8, piece::BLACK);
     }
 
     return false; // Invalid castling move
@@ -141,6 +152,18 @@ bool Game_State::is_in_check(piece::Color color) {
         return true;
     }
     return false;
+}
+
+Game_State Game_State::copy() const {
+    return Game_State(this->current_board.copy(),
+                      this->turn,
+                      this->white_castle_kingside,
+                      this->white_castle_queenside,
+                      this->black_castle_kingside,
+                      this->black_castle_queenside,
+                      this->en_passant_square,
+                      this->halfmove_clock,
+                      this->fullmove_number);
 }
 
 bool Game_State::make_move(int from, int to, piece::Type piece_type, piece::Color color, moves::Type move_type, piece::Type promotion) {
@@ -218,6 +241,9 @@ bool Game_State::make_move(int from, int to, piece::Type piece_type, piece::Colo
 
     // Handle promotion
     if (move_type == moves::Type::PROMOTION) {
+        if (current_board.is_capture(to, turn)) {
+            current_board.remove_piece(to, (turn == piece::Color::WHITE) ? piece::Color::BLACK : piece::Color::WHITE);
+        }
         current_board.move_piece(from, to, piece_type, turn); // Move the pawn
         bit::Bitboard &new_piece_bitboard = current_board.get_pieces(promotion, turn);
         piece_bitboard &= ~to_mask;    // Remove the pawn

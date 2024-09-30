@@ -24,6 +24,25 @@ bit::Bitboard rank_6 = 280375465082880ULL;
 bit::Bitboard rank_7 = 71776119061217280ULL;
 bit::Bitboard rank_8 = 18374686479671623680ULL;
 
+std::vector<int> Board::get_squares_with_piece(piece::Type type, piece::Color color) const {
+    std::vector<int> squares;
+    bit::Bitboard piece_bitboard = get_pieces(type, color);
+
+    bit::Bitboard temp_bitboard = piece_bitboard;
+    while (temp_bitboard) {
+        int square = __builtin_ffsll(temp_bitboard) - 1; // Find the first set bit (square index)
+        squares.push_back(square);
+        temp_bitboard &= temp_bitboard - 1; // Clear the least significant set bit
+    }
+
+    return squares;
+}
+
+board::Board board::Board::copy() const {
+    return Board(this->wp, this->wb, this->wn, this->wr, this->wq, this->wk,
+                 this->bp, this->bb, this->bn, this->br, this->bq, this->bk);
+}
+
 Board set_position(std::string fen) {
     bit::Bitboard wp = 0ULL, wb = 0ULL, wn = 0ULL, wr = 0ULL, wq = 0ULL, wk = 0ULL;
     bit::Bitboard bp = 0ULL, bb = 0ULL, bn = 0ULL, br = 0ULL, bq = 0ULL, bk = 0ULL;

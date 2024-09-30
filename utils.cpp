@@ -27,4 +27,27 @@ piece::Color opposite_color(piece::Color c) {
     return (c == piece::Color::WHITE) ? piece::Color::BLACK : piece::Color::WHITE;
 }
 
+std::string piece_type_to_string(piece::Type type) {
+    switch (type) {
+    case piece::Type::PAWN:
+        return "Pawn";
+    case piece::Type::KNIGHT:
+        return "Knight";
+    case piece::Type::BISHOP:
+        return "Bishop";
+    case piece::Type::ROOK:
+        return "Rook";
+    case piece::Type::QUEEN:
+        return "Queen";
+    case piece::Type::KING:
+        return "King";
+    default:
+        return "Unknown";
+    }
+}
+
+std::string piece_color_to_string(piece::Color color) {
+    return (color == piece::Color::WHITE) ? "White" : "Black";
+}
+
 } // namespace utils

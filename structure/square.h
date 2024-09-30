@@ -19,6 +19,8 @@ std::string square_to_string(Square square);
 
 Square string_to_square(const std::string &square_str);
 
+std::string int_position_to_string(int square);
+
 } // namespace square
 } // namespace chess_engine
 #endif

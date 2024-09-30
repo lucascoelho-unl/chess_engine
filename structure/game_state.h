@@ -51,13 +51,22 @@ class Game_State {
     void switch_turn();
     void update_castling_rights(int from, int to);
     void update_en_passant(int from, int to);
-    bool is_castling_valid(int from, int to, piece::Color color);
+    bool is_castling_valid(int from, int to, piece::Color color) const;
     bool is_in_check(piece::Color color);
+    Game_State copy() const;
 
-    bool make_move(int from, int to, piece::Type piece_type, piece::Color color, moves::Type move_type, piece::Type promotion);
+    bool make_move(int from, int to, piece::Type piece_type, piece::Color color, moves::Type move_type = moves::Type::NORMAL, piece::Type promotion = piece::Type::EMPTY);
     bool unmake_move();
 
-    const board::Board &get_board() const { return current_board; }
+    // Const version of get_board (read-only access)
+    const board::Board &get_board() const {
+        return current_board;
+    }
+
+    // Non-const version of get_board (for modification)
+    board::Board &get_board() {
+        return current_board;
+    }
 };
 
 // Function declarations

@@ -1,8 +1,8 @@
+#include "../enums.h"
 #include "../moves/moves.h"
 #include "../structure/bitboard.h"
 #include "../structure/game_state.h"
 #include "../structure/square.h"
-#include "../enums.h"
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -80,6 +80,20 @@ bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board,
 
     // Pawn promotion: handled during move execution (no need to flag it here, just move to final rank)
     return moves;
+}
+
+bit::Bitboard get_possible_attacks(piece::Color color, bit::Bitboard pawns) {
+    bit::Bitboard pawn_attacks = 0ULL;
+
+    if (color == piece::WHITE) {
+        pawn_attacks |= ((pawns & ~board::a_file) << 7); // Left attacks
+        pawn_attacks |= ((pawns & ~board::h_file) << 9); // Right attacks
+    } else {
+        pawn_attacks |= ((pawns & ~board::a_file) >> 9); // Left attacks
+        pawn_attacks |= ((pawns & ~board::h_file) >> 7); // Right attacks
+    }
+
+    return pawn_attacks;
 }
 
 } // namespace pawn

@@ -1,6 +1,4 @@
-#ifndef CHESS_ENGINE_MOVES_H
-#define CHESS_ENGINE_MOVES_H
-
+#include "moves.h"
 #include "../enums.h"
 #include "../pieces/bishop.h"
 #include "../pieces/king.h"
@@ -14,7 +12,11 @@
 #include "../utils.h"
 #include "slide/diagonal.h"
 #include "slide/straight.h"
+#include <condition_variable>
+#include <deque>
 #include <future>
+#include <iostream>
+#include <mutex>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -139,36 +141,91 @@ bit::Bitboard get_piece_moves(int from, piece::Type type, piece::Color color, co
     return moves;
 }
 
-bit::Bitboard generate_all_piece_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
-    std::vector<std::future<bit::Bitboard>> move_futures;
-
-    move_futures.emplace_back(std::async(std::launch::async, [&board, color, &game_state]() {
-        return get_all_moves_for_piece(piece::Type::PAWN, color, board, game_state);
-    }));
-    move_futures.emplace_back(std::async(std::launch::async, [&board, color, &game_state]() {
-        return get_all_moves_for_piece(piece::Type::KNIGHT, color, board, game_state);
-    }));
-    move_futures.emplace_back(std::async(std::launch::async, [&board, color, &game_state]() {
-        return get_all_moves_for_piece(piece::Type::BISHOP, color, board, game_state);
-    }));
-    move_futures.emplace_back(std::async(std::launch::async, [&board, color, &game_state]() {
-        return get_all_moves_for_piece(piece::Type::ROOK, color, board, game_state);
-    }));
-    move_futures.emplace_back(std::async(std::launch::async, [&board, color, &game_state]() {
-        return get_all_moves_for_piece(piece::Type::QUEEN, color, board, game_state);
-    }));
-    move_futures.emplace_back(std::async(std::launch::async, [&board, color, &game_state]() {
-        return get_all_moves_for_piece(piece::Type::KING, color, board, game_state);
-    }));
-
+// Function to generate all moves for pieces, using the thread pool
+bit::Bitboard generate_all_piece_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state, bool exclude_king) {
     bit::Bitboard all_moves = 0ULL;
-    for (auto &future : move_futures) {
-        all_moves |= future.get();
+
+    // Generate moves for all pieces except the king if exclude_king is true
+    for (auto type : {piece::Type::PAWN, piece::Type::KNIGHT, piece::Type::BISHOP, piece::Type::ROOK, piece::Type::QUEEN}) {
+        all_moves |= get_all_moves_for_piece(type, color, board, game_state);
+    }
+
+    // Conditionally add king's moves
+    if (!exclude_king) {
+        all_moves |= get_all_moves_for_piece(piece::Type::KING, color, board, game_state);
+    }
+
+    return all_moves;
+}
+
+std::vector<Move> extract_moves_from_bitboard(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+    std::vector<Move> moves;
+
+    bit::Bitboard attack_bitboard = get_piece_moves(from, type, color, board, game_state);
+    bit::Bitboard opponent_occupancy = (color == piece::Color::WHITE) ? board.get_black_pieces() : board.get_white_pieces();
+
+    while (attack_bitboard) {
+        int to = __builtin_ffsll(attack_bitboard) - 1; // Find the first set bit
+        attack_bitboard &= attack_bitboard - 1;        // Clear the least significant set bit
+
+        moves::Type move_type = moves::NORMAL;
+        piece::Type promotion = piece::Type::EMPTY;
+
+        // Handle capture
+        if (opponent_occupancy & (1ULL << to)) {
+            move_type = moves::CAPTURE;
+        }
+
+        // Handle special pawn moves (promotion)
+        if (type == piece::Type::PAWN) {
+            if ((to <= 7 || to >= 56)) { // Pawn reaches promotion row
+                move_type = moves::PROMOTION;
+                for (auto promotion_type : {piece::Type::QUEEN, piece::Type::ROOK, piece::Type::BISHOP, piece::Type::KNIGHT}) {
+                    moves.push_back(Move(from, to, type, color, move_type, promotion_type));
+                }
+                continue; // Skip normal move addition as promotions are handled
+            }
+            if (to == game_state.en_passant_square) {
+                move_type = moves::EN_PASSANT;
+            }
+        }
+
+        // Handle castling
+        if (type == piece::Type::KING) {
+            if ((color == piece::Color::WHITE && from == 4 && (to == 2 || to == 6)) ||
+                (color == piece::Color::BLACK && from == 60 && (to == 56 || to == 63))) {
+                move_type = moves::CASTLING;
+            }
+        }
+
+        moves.push_back(Move(from, to, type, color, move_type, promotion));
+    }
+
+    return moves;
+}
+
+std::vector<Move> extract_all_possible_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+    std::vector<Move> all_moves;
+
+    // Loop through each piece type
+    for (auto type : {piece::Type::PAWN, piece::Type::KNIGHT, piece::Type::BISHOP, piece::Type::ROOK, piece::Type::QUEEN, piece::Type::KING}) {
+        // Get the bitboard for the current piece type
+        bit::Bitboard piece_bitboard = board.get_pieces(type, color);
+
+        // Loop through all the pieces of this type
+        while (piece_bitboard) {
+            int from_square = __builtin_ffsll(piece_bitboard) - 1; // Find the first set bit (piece position)
+            piece_bitboard &= piece_bitboard - 1;                  // Clear the least significant set bit
+
+            // Extract moves for this piece from this square
+            std::vector<Move> moves_for_piece = extract_moves_from_bitboard(from_square, type, color, board, game_state);
+
+            // Append to the overall moves list
+            all_moves.insert(all_moves.end(), moves_for_piece.begin(), moves_for_piece.end());
+        }
     }
     return all_moves;
 }
 
 } // namespace moves
 } // namespace chess_engine
-
-#endif // CHESS_ENGINE_MOVES_H
