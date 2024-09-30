@@ -58,5 +58,24 @@ std::string int_position_to_string(int square) {
     return std::string(1, file) + rank;
 }
 
+// Convert a square in algebraic notation (e.g., "e2") to an integer index (0-63)
+int string_position_to_int(const std::string &square) {
+    if (square.length() != 2) {
+        throw std::invalid_argument("Invalid square format. Must be 2 characters.");
+    }
+
+    char file = square[0];
+    char rank = square[1];
+
+    if (file < 'a' || file > 'h' || rank < '1' || rank > '8') {
+        throw std::invalid_argument("Invalid square coordinates.");
+    }
+
+    int file_num = file - 'a';
+    int rank_num = rank - '1';
+
+    return rank_num * 8 + file_num;
+}
+
 } // namespace square
 } // namespace chess_engine

@@ -1,7 +1,7 @@
 #ifndef CHESS_ENGINE_UTILS_H
 #define CHESS_ENGINE_UTILS_H
 
-#include "../enums.h"
+#include "enums.h"
 #include "moves/moves.h"
 #include "structure/bitboard.h"
 #include "structure/board.h"
@@ -19,6 +19,8 @@ using namespace chess_engine;
 void print_bitboard(bit::Bitboard b);
 
 piece::Color opposite_color(piece::Color c);
+
+std::string move_type_to_string(moves::Type type);
 
 std::string piece_type_to_string(piece::Type type);
 

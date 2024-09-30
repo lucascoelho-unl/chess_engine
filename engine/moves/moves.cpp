@@ -158,7 +158,7 @@ bit::Bitboard generate_all_piece_moves(piece::Color color, const board::Board &b
     return all_moves;
 }
 
-std::vector<Move> extract_moves_from_bitboard(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+std::vector<Move> generate_moves_for_piece(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
     std::vector<Move> moves;
 
     bit::Bitboard attack_bitboard = get_piece_moves(from, type, color, board, game_state);
@@ -204,7 +204,7 @@ std::vector<Move> extract_moves_from_bitboard(int from, piece::Type type, piece:
     return moves;
 }
 
-std::vector<Move> extract_all_possible_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+std::vector<Move> generate_pseudo_legal_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
     std::vector<Move> all_moves;
 
     // Loop through each piece type
@@ -218,13 +218,79 @@ std::vector<Move> extract_all_possible_moves(piece::Color color, const board::Bo
             piece_bitboard &= piece_bitboard - 1;                  // Clear the least significant set bit
 
             // Extract moves for this piece from this square
-            std::vector<Move> moves_for_piece = extract_moves_from_bitboard(from_square, type, color, board, game_state);
+            std::vector<Move> moves_for_piece = generate_moves_for_piece(from_square, type, color, board, game_state);
 
             // Append to the overall moves list
             all_moves.insert(all_moves.end(), moves_for_piece.begin(), moves_for_piece.end());
         }
     }
     return all_moves;
+}
+
+std::vector<moves::Move> generate_legal_moves(piece::Color color, game_state::Game_State &game_state) {
+    std::vector<moves::Move> legal_moves;
+    const board::Board &board = game_state.get_board();
+    // clang-format off
+    // List of chess squares in integer form, ordered by importance
+    std::vector<int> chess_square_indices = {
+        // Central squares
+        27, 28, 35, 36,
+        // Adjacent to central squares
+        26, 29, 34, 37, 18, 19, 20, 21, 42, 43, 44, 45,
+        // Further out
+        49, 50, 51, 52, 53, 54, 
+        41, 46, 33, 38, 25, 30, 17, 22,
+        9, 10, 11, 12, 13, 14,
+        // Remaining squares
+        15, 23, 31, 39, 47, 55,
+        48, 40, 32, 24, 16, 8, 
+        0, 1, 2, 3, 4, 5, 6, 7, 
+        56, 57, 58, 59, 60, 61, 62, 63, 
+    };
+    // clang-format on
+
+    for (int sq : chess_square_indices) {
+        // Get piece type and color
+        piece::Type piece_type = board.get_piece_type(sq, color);
+        if (piece_type == piece::Type::EMPTY)
+            continue; // Skip empty squares
+
+        // Generate all pseudo-legal moves for the piece
+        std::vector<moves::Move> pseudo_moves = generate_moves_for_piece(sq, piece_type, color, board, game_state);
+
+        for (const auto &move : pseudo_moves) {
+            // If the piece is the king, check if it moves into an attacked square
+            if (piece_type == piece::Type::KING) {
+                if (game_state.is_square_attacked(move.to, color)) {
+                    continue; // Skip if king moves into check
+                }
+            }
+            // Temporarily make the move and check if the king is left in check
+            game_state.make_pseudo_move(move);
+            if (!game_state.is_in_check(color)) {
+                legal_moves.push_back(move);
+            }
+            game_state.unmake_move();
+        }
+    }
+    return legal_moves;
+}
+
+std::string to_string(const Move &move) {
+    // Convert individual fields to string representations
+    std::string from_str = square::int_position_to_string(move.from);
+    std::string to_str = square::int_position_to_string(move.to);
+    std::string piece_type_str = utils::piece_type_to_string(move.piece_type);
+    std::string color_str = utils::piece_color_to_string(move.color);
+    std::string move_type_str = utils::move_type_to_string(move.move_type);
+    std::string promotion_str = (move.promotion != piece::Type::EMPTY) ? utils::piece_type_to_string(move.promotion) : "None";
+
+    // Construct the final string with all details
+    std::string result = "Move: " + color_str + " " + piece_type_str + " from " + from_str + " to " + to_str +
+                         ", Move Type: " + move_type_str +
+                         (move.promotion != piece::Type::EMPTY ? ", Promotion: " + promotion_str : "");
+
+    return result;
 }
 
 } // namespace moves

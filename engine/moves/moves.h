@@ -25,8 +25,23 @@ struct Move {
     moves::Type move_type;
     piece::Type promotion;
 
+    Move() : from(-1), to(-1), piece_type(piece::Type::EMPTY), color(piece::Color::WHITE), move_type(moves::Type::NORMAL), promotion(piece::Type::EMPTY) {}
+
     Move(int from, int to, piece::Type piece_type, piece::Color color, moves::Type move_type = moves::Type::NORMAL, piece::Type promotion = piece::Type::EMPTY)
         : from(from), to(to), piece_type(piece_type), color(color), move_type(move_type), promotion(promotion) {}
+};
+
+struct Reversible_Move {
+    Move move;
+    piece::Color turn;
+    piece::Type captured_piece;
+    bool white_castle_kingside;
+    bool white_castle_queenside;
+    bool black_castle_kingside;
+    bool black_castle_queenside;
+    int en_passant_square;
+    int halfmove_clock;
+    int fullmove_number;
 };
 
 // Get moves from a specific square for a piece of the specified color
@@ -52,10 +67,15 @@ bit::Bitboard get_piece_moves(int from, piece::Type type, piece::Color color, co
 bit::Bitboard generate_all_piece_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state, bool exclude_king = false);
 
 // Method of generating a list of valid moves for a piece given its move bitboard.
-std::vector<Move> extract_moves_from_bitboard(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
+std::vector<Move> generate_moves_for_piece(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
 
 // Extract all possible moves for all pieces and returns a list of them.
-std::vector<Move> extract_all_possible_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
+std::vector<Move> generate_pseudo_legal_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
+
+// Get only legal moves, no moves that leave the king in check are left here.
+std::vector<moves::Move> generate_legal_moves(piece::Color color, game_state::Game_State &game_state);
+
+std::string to_string(const Move &move);
 
 } // namespace moves
 } // namespace chess_engine

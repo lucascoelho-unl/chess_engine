@@ -253,6 +253,15 @@ class Board {
         return true;
     }
 
+    bool add_piece(int from, piece::Type type, piece::Color color) {
+        bit::Bitboard &piece_bitboard = get_pieces(type, color);
+        bit::Bitboard from_mask = 1ULL << from;
+
+        piece_bitboard |= from_mask;
+
+        return true;
+    }
+
     std::vector<int> get_squares_with_piece(piece::Type type, piece::Color color) const;
 };
 

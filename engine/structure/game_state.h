@@ -6,8 +6,8 @@
 #include "../utils.h"
 #include "bitboard.h"
 #include "board.h"
+#include <deque>
 #include <iostream>
-#include <stack>
 #include <string>
 
 namespace chess_engine {
@@ -15,7 +15,7 @@ namespace game_state {
 
 class Game_State {
   public:
-    board::Board current_board;  // The current state of the chessboard
+    board::Board board;          // The current state of the chessboard
     piece::Color turn;           // Whose turn it is (White or Black)
     bool white_castle_kingside;  // White's kingside castling rights
     bool white_castle_queenside; // White's queenside castling rights
@@ -26,7 +26,7 @@ class Game_State {
     int fullmove_number;         // The current move number (increases after Black's move)
 
     bool operator==(const Game_State &other) const {
-        return current_board == other.current_board &&
+        return board == other.board &&
                turn == other.turn &&
                white_castle_kingside == other.white_castle_kingside &&
                white_castle_queenside == other.white_castle_queenside &&
@@ -38,34 +38,34 @@ class Game_State {
     }
 
     // Stack to store previous game states (useful for unmaking moves)
-    std::stack<Game_State> previous_states;
+    std::deque<moves::Reversible_Move> move_history;
 
     Game_State() = default; // Default constructor
 
     Game_State(const board::Board &board, piece::Color turn, bool w_k_castle, bool w_q_castle,
                bool b_k_castle, bool b_q_castle, int en_passant, int halfmove, int fullmove);
 
+    bool is_game_over();
     bool is_square_attacked(int sq, piece::Color color) const;
-    void save_state();
-    void restore_previous_state();
     void switch_turn();
     void update_castling_rights(int from, int to);
     void update_en_passant(int from, int to);
     bool is_castling_valid(int from, int to, piece::Color color) const;
-    bool is_in_check(piece::Color color);
+    const bool is_in_check(piece::Color color) const;
     Game_State copy() const;
 
-    bool make_move(int from, int to, piece::Type piece_type, piece::Color color, moves::Type move_type = moves::Type::NORMAL, piece::Type promotion = piece::Type::EMPTY);
+    bool make_move(moves::Move move);
+    bool make_pseudo_move(moves::Move move);
     bool unmake_move();
 
     // Const version of get_board (read-only access)
     const board::Board &get_board() const {
-        return current_board;
+        return board;
     }
 
     // Non-const version of get_board (for modification)
     board::Board &get_board() {
-        return current_board;
+        return board;
     }
 };
 

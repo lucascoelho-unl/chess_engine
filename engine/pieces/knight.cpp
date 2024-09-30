@@ -1,9 +1,9 @@
+#include "../enums.h"
 #include "../moves/moves.h"
 #include "../structure/bitboard.h"
 #include "../structure/game_state.h"
 #include "../structure/square.h"
 #include "../utils.h"
-#include "../enums.h"
 #include <array>
 #include <cstdint>
 #include <sstream>

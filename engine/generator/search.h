@@ -10,7 +10,7 @@
 namespace chess_engine {
 namespace search {
 
-moves::Move find_best_move(game_state::Game_State &game_state, int depth);
+moves::Move find_best_move(int depth, piece::Color color, game_state::Game_State &game_state);
 
 } // namespace search
 } // namespace chess_engine

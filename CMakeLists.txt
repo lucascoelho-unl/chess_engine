@@ -14,18 +14,20 @@ include_directories(
 
 # List all the source files and add them to the executable target
 add_executable(chess_engine
-    main.cpp
-    utils.cpp
-    structure/board.cpp
-    structure/game_state.cpp
-    structure/square.cpp
-    moves/moves.cpp
-    moves/slide/diagonal.cpp
-    moves/slide/straight.cpp
-    pieces/pawn.cpp
-    pieces/knight.cpp
-    pieces/bishop.cpp
-    pieces/rook.cpp
-    pieces/queen.cpp
-    pieces/king.cpp
+    engine/main.cpp
+    engine/utils.cpp
+    engine/structure/board.cpp
+    engine/structure/game_state.cpp
+    engine/structure/square.cpp
+    engine/moves/moves.cpp
+    engine/moves/slide/diagonal.cpp
+    engine/moves/slide/straight.cpp
+    engine/pieces/pawn.cpp
+    engine/pieces/knight.cpp
+    engine/pieces/bishop.cpp
+    engine/pieces/rook.cpp
+    engine/pieces/queen.cpp
+    engine/pieces/king.cpp
+    engine/generator/evaluate.cpp
+    engine/generator/search.cpp
 )

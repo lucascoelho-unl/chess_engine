@@ -1,5 +1,4 @@
 #include "utils.h"
-#include "moves/moves.h"
 #include "structure/bitboard.h"
 #include "structure/board.h"
 #include "structure/square.h"
@@ -41,6 +40,23 @@ std::string piece_type_to_string(piece::Type type) {
         return "Queen";
     case piece::Type::KING:
         return "King";
+    default:
+        return "Unknown";
+    }
+}
+
+std::string move_type_to_string(moves::Type type) {
+    switch (type) {
+    case moves::Type::NORMAL:
+        return "Normal";
+    case moves::Type::CAPTURE:
+        return "Capture";
+    case moves::Type::CASTLING:
+        return "Castling";
+    case moves::Type::EN_PASSANT:
+        return "En-Passant";
+    case moves::Type::PROMOTION:
+        return "Promotion";
     default:
         return "Unknown";
     }

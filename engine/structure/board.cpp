@@ -38,7 +38,7 @@ std::vector<int> Board::get_squares_with_piece(piece::Type type, piece::Color co
     return squares;
 }
 
-board::Board board::Board::copy() const {
+Board Board::copy() const {
     return Board(this->wp, this->wb, this->wn, this->wr, this->wq, this->wk,
                  this->bp, this->bb, this->bn, this->br, this->bq, this->bk);
 }
