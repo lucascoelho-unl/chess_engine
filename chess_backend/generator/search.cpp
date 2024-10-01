@@ -24,14 +24,14 @@ std::vector<moves::Move> order_moves(const std::vector<moves::Move> &moves, cons
 
         // Prioritize captures
         if (move.move_type == moves::Type::CAPTURE) {
-            score += 1500;
+            score += 150;
             // Prioritize capturing higher value pieces
             score += 10 * evaluate::piece_value(game_state.get_board().get_piece_type(move.to, utils::opposite_color(move.color)));
         }
 
         // Prioritize promotions
         if (move.move_type == moves::Type::PROMOTION) {
-            score += 10000;
+            score += 1000;
         }
 
         scored_moves.emplace_back(score, move);

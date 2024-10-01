@@ -25,6 +25,30 @@
 namespace chess_engine {
 namespace moves {
 
+int find_king_square(piece::Color color, const board::Board &board) {
+    bit::Bitboard king_bitboard = board.get_pieces(piece::Type::KING, color);
+    return __builtin_ffsll(king_bitboard) - 1;
+}
+
+bool is_square_attacked_after_move(int square, piece::Color attacker_color, const Move &move, const board::Board &board, game_state::Game_State &game_state) {
+    // Create a copy of the board
+    board::Board temp_board = board.copy();
+
+    // Update the temporary board with the move
+    temp_board.remove_piece(move.from, move.color);
+    temp_board.add_piece(move.to, move.piece_type, move.color);
+
+    // If the move is a capture, remove the captured piece
+    if (temp_board.is_capture(move.to, move.color)) {
+        temp_board.remove_piece(move.to, utils::opposite_color(move.color));
+    }
+
+    game_state::Game_State temp_game_state = game_state::Game_State(temp_board, move.color, false, false, false, false, -1, 0, 0);
+
+    // Now check if the square is attacked on this updated board
+    return temp_game_state.is_square_attacked(square, move.color);
+}
+
 inline bit::Bitboard get_pawn_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
     return pawn::get_moves(from, color, board, game_state);
 }
@@ -205,54 +229,56 @@ std::vector<Move> generate_moves_for_piece(int from, piece::Type type, piece::Co
 }
 
 std::vector<Move> generate_pseudo_legal_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
-    std::vector<std::future<std::vector<Move>>> futures;
     std::vector<Move> all_moves;
-    all_moves.reserve(218);
 
-    // Launch threads for different piece types
+    // Loop through each piece type
     for (auto type : {piece::Type::QUEEN, piece::Type::ROOK, piece::Type::KING, piece::Type::BISHOP, piece::Type::KNIGHT, piece::Type::PAWN}) {
-        futures.push_back(std::async(std::launch::async, [&, type] {
-            std::vector<Move> piece_moves;
-            bit::Bitboard piece_bitboard = board.get_pieces(type, color);
+        // Get the bitboard for the current piece type
+        bit::Bitboard piece_bitboard = board.get_pieces(type, color);
 
-            while (piece_bitboard) {
-                int from_square = __builtin_ffsll(piece_bitboard) - 1;
-                piece_bitboard &= piece_bitboard - 1;
+        // Loop through all the pieces of this type
+        while (piece_bitboard) {
+            int from_square = __builtin_ffsll(piece_bitboard) - 1; // Find the first set bit (piece position)
+            piece_bitboard &= piece_bitboard - 1;                  // Clear the least significant set bit
 
-                // Extract moves for this piece from this square
-                auto moves_for_piece = generate_moves_for_piece(from_square, type, color, board, game_state);
-                piece_moves.insert(piece_moves.end(), moves_for_piece.begin(), moves_for_piece.end());
-            }
-            return piece_moves;
-        }));
+            // Extract moves for this piece from this square
+            std::vector<Move> moves_for_piece = generate_moves_for_piece(from_square, type, color, board, game_state);
+
+            // Append to the overall moves list
+            all_moves.insert(all_moves.end(), moves_for_piece.begin(), moves_for_piece.end());
+        }
     }
-
-    // Collect results from all threads
-    for (auto &f : futures) {
-        auto piece_moves = f.get();
-        all_moves.insert(all_moves.end(), piece_moves.begin(), piece_moves.end());
-    }
-
     return all_moves;
 }
 
-std::vector<moves::Move> generate_legal_moves(piece::Color color, game_state::Game_State &game_state) {
-    std::vector<moves::Move> pseudo_moves = generate_pseudo_legal_moves(color, game_state.get_board(), game_state);
-    std::vector<moves::Move> legal_moves;
+std::vector<Move> generate_legal_moves(piece::Color color, game_state::Game_State &game_state) {
+    std::vector<Move> legal_moves;
+    legal_moves.reserve(218);
 
-    for (const auto &move : pseudo_moves) {
-        // If the piece is the king, check if it moves into an attacked square
-        if (move.piece_type == piece::Type::KING) {
-            if (game_state.is_square_attacked(move.to, color)) {
-                continue; // Skip if king moves into check
+    const board::Board &board = game_state.get_board();
+    int king_square = find_king_square(color, board);
+
+    for (auto type : {piece::Type::QUEEN, piece::Type::ROOK, piece::Type::KING, piece::Type::BISHOP, piece::Type::KNIGHT, piece::Type::PAWN}) {
+        bit::Bitboard piece_bitboard = board.get_pieces(type, color);
+        while (piece_bitboard) {
+            int from_square = __builtin_ffsll(piece_bitboard) - 1;
+            piece_bitboard &= piece_bitboard - 1;
+
+            std::vector<Move> pseudo_legal_moves = generate_moves_for_piece(from_square, type, color, board, game_state);
+
+            for (const Move &move : pseudo_legal_moves) {
+                // If the moving piece is the king, check the destination square
+                if (type == piece::Type::KING) {
+                    if (!is_square_attacked_after_move(move.to, move.color, move, board, game_state)) {
+                        legal_moves.push_back(move);
+                    }
+                }
+                // For other pieces, check if the move leaves the king in check
+                else if (!is_square_attacked_after_move(king_square, move.color, move, board, game_state)) {
+                    legal_moves.push_back(move);
+                }
             }
         }
-        // Temporarily make the move and check if the king is left in check
-        game_state.make_pseudo_move(move);
-        if (!game_state.is_in_check(color)) {
-            legal_moves.push_back(move);
-        }
-        game_state.unmake_move();
     }
 
     return legal_moves;
