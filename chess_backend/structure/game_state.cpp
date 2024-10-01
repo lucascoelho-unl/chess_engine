@@ -340,11 +340,7 @@ bool Game_State::make_pseudo_move(moves::Move move) {
 
     // Wrong color moving
     if (color != turn) {
-        std::cout << "-=-=-=-=-=" << std::endl;
-        std::cout << "Pseudo Move! Not this color's turn." << std::endl;
-        std::cout << moves::to_string(move) << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        std::cout << "-=-=-=-=-=" << std::endl;
+        std::cout << "Pseudo Move! Not color's turn." << std::endl;
         return false;
     }
 

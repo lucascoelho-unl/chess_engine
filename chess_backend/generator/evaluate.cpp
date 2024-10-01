@@ -26,5 +26,21 @@ int evaluate(game_state::Game_State &state) {
     return white_score - black_score; // Positive if white is winning, negative if black is winning
 }
 
+int piece_value(piece::Type type) {
+    switch (type) {
+    case piece::Type::PAWN:
+        return 100;
+    case piece::Type::KNIGHT:
+        return 320;
+    case piece::Type::BISHOP:
+        return 330;
+    case piece::Type::ROOK:
+        return 500;
+    case piece::Type::QUEEN:
+        return 900;
+    }
+    return 0;
+}
+
 } // namespace evaluate
 } // namespace chess_engine

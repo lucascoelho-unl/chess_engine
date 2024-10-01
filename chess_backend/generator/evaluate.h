@@ -11,6 +11,7 @@ namespace chess_engine {
 namespace evaluate {
 
 int evaluate(game_state::Game_State &state);
+int piece_value(piece::Type type);
 
 } // namespace evaluate
 } // namespace chess_engine
