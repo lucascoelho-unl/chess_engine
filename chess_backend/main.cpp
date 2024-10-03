@@ -63,35 +63,13 @@ piece::Type get_promotion_type() {
 const int INF = std::numeric_limits<int>::max();
 const int NEG_INF = std::numeric_limits<int>::min();
 
-// int main() {
-//     // Initialize game state, etc.
-//     std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/QNBQKBNQ w - - 0 1";
-//     //     // std::string fen = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/1NBQK2R w Kkq - 0 1";
-//     //     // std::string fen = "rr2k3/8/8/8/8/8/8/7K w - - 0 1";
-//     //     // std::string fen = "8/2q1P1k1/8/8/8/8/8/K7 w - - 0 1";
-//     //     // std::string fen = "rnqbbnkr/pppppppp/8/8/8/8/PPPPPPPP/RNQBBNKR w - - 0 1";
-
-//     //     // Create the game state from the FEN string
-//     game_state::Game_State game_state = game_state::set_game_state(fen);
-
-//     int evaluation = 0;
-//     if (game_state.turn == piece::Color::WHITE) {
-//         evaluation = chess_engine::search::minimax(3, NEG_INF, INF, true, game_state);
-//     } else {
-//         evaluation = chess_engine::search::minimax(3, NEG_INF, INF, false, game_state);
-//     }
-//     std::cout << "Evaluation: " << evaluation << std::endl;
-
-//     return 0;
-// }
-
 int main() {
     // Initial FEN for starting position
-    std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1";
+    // std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1";
     // std::string fen = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/1NBQK2R w Kkq - 0 1";
     // std::string fen = "rr2k3/8/8/8/8/8/8/7K w - - 0 1";
     // std::string fen = "8/2q1P1k1/8/8/8/8/8/K7 w - - 0 1";
-    // std::string fen = "rnqbbnkr/pppppppp/8/8/8/8/PPPPPPPP/RNQBBNKR w - - 0 1";
+    std::string fen = "bbrqnnkr/pppppppp/8/8/8/8/PPPPPPPP/BBRQNNKR w - - 0 1";
 
     // Create the game state from the FEN string
     game_state::Game_State game_state = game_state::set_game_state(fen);
@@ -100,18 +78,18 @@ int main() {
     while (true) {
         print_board(game_state);
         // Display board evaluation after the move
-        int evaluation = evaluate::evaluate(game_state);
-        std::cout << "Current board evaluation: " << evaluation << std::endl;
+        int evaluation = evaluate::evaluate(game_state.turn, game_state);
+        std::cout << "Current board evaluation: " << game_state.turn << " " << evaluation << std::endl;
 
         // Determine whose turn it is
-        piece::Color current_color = game_state.turn;
-        std::string player = (current_color == piece::Color::WHITE) ? "White" : "Black";
+        bool current_color = (game_state.turn == piece::Color::WHITE);
+        std::string player = (current_color) ? "White" : "Black";
         std::cout << player << "'s turn (Engine)...\n";
 
         // Start timing
         auto start_time = std::chrono::high_resolution_clock::now();
 
-        moves::Move best_move = search::find_best_move(3, current_color, game_state);
+        moves::Move best_move = search::find_best_move(4, game_state.turn, game_state);
 
         // End timing
         auto end_time = std::chrono::high_resolution_clock::now();

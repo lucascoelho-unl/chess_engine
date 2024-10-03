@@ -57,86 +57,43 @@ std::vector<moves::Move> order_moves(const std::vector<moves::Move> &moves, cons
     return ordered_moves;
 }
 
-int minimax(int depth, int alpha, int beta, bool isMaximizingPlayer, game_state::Game_State &game_state) {
-    // Base case: If game over or max depth reached, return evaluation
+std::pair<int, moves::Move> negamax(int depth, int alpha, int beta, piece::Color color, game_state::Game_State &game_state) {
+    // Base case: If the game is over or max depth is reached, return evaluation
     if (game_state.is_game_over()) {
-        return evaluate::evaluate(game_state) * (depth + 1);
+        return {-evaluate::evaluate(color, game_state) * (depth + 1), moves::Move()};
     }
 
     if (depth == 0) {
-        return evaluate::evaluate(game_state);
+        return {evaluate::evaluate(color, game_state), moves::Move()};
     }
 
-    if (isMaximizingPlayer) {
-        int maxEval = NEG_INF;
-        std::vector<moves::Move> possible_moves = order_moves(moves::generate_legal_moves(piece::Color::WHITE, game_state), game_state);
-
-        for (const auto &move : possible_moves) {
-            game_state.make_move(move);
-            int eval = minimax(depth - 1, alpha, beta, false, game_state);
-            game_state.unmake_move();
-            maxEval = std::max(maxEval, eval);
-            alpha = std::max(alpha, eval);
-            if (beta <= alpha) {
-                break;
-            }
-        }
-        return maxEval;
-    } else {
-        int minEval = INF;
-        std::vector<moves::Move> possible_moves = order_moves(moves::generate_legal_moves(piece::Color::BLACK, game_state), game_state);
-
-        for (const auto &move : possible_moves) {
-            game_state.make_move(move);
-            int eval = minimax(depth - 1, alpha, beta, true, game_state);
-            game_state.unmake_move();
-            minEval = std::min(minEval, eval);
-            beta = std::min(beta, eval);
-            if (beta <= alpha) {
-                break;
-            }
-        }
-        return minEval;
-    }
-}
-
-moves::Move find_best_move(int depth, piece::Color color, game_state::Game_State &game_state) {
-    int best_eval = (color == piece::Color::WHITE) ? NEG_INF : INF;
+    int maxEval = NEG_INF;
     moves::Move best_move;
-    int alpha = NEG_INF;
-    int beta = INF;
-
     std::vector<moves::Move> possible_moves = order_moves(moves::generate_legal_moves(color, game_state), game_state);
-    bool is_maximizing = (color == piece::Color::WHITE);
 
     for (const auto &move : possible_moves) {
         game_state.make_move(move);
-        int move_eval = minimax(depth - 1, alpha, beta, !is_maximizing, game_state);
+        int eval = -negamax(depth - 1, -beta, -alpha, utils::opposite_color(color), game_state).first;
         game_state.unmake_move();
 
-        if ((color == piece::Color::WHITE && move_eval > best_eval) ||
-            (color == piece::Color::BLACK && move_eval < best_eval)) {
-            // std::cout << "Evaluation: " << color << " " << move_eval << " > " << best_eval << std::endl;
-            // std::cout << game_state.get_board().to_string() << std::endl;
-            // std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            best_eval = move_eval;
+        if (eval > maxEval) {
+            maxEval = eval;
             best_move = move;
         }
 
-        // Update alpha and beta
-        if (color == piece::Color::WHITE) {
-            alpha = std::max(alpha, best_eval);
-        } else {
-            beta = std::min(beta, best_eval);
-        }
-
-        // Prune if possible
-        if (beta <= alpha) {
+        alpha = std::max(alpha, eval);
+        if (alpha >= beta) {
             break;
         }
     }
 
-    return best_move;
+    return {maxEval, best_move};
+}
+
+moves::Move find_best_move(int depth, piece::Color color, game_state::Game_State &game_state) {
+    // Find the best move using negamax with alpha-beta pruning
+    std::pair<int, moves::Move> result = negamax(depth, NEG_INF, INF, color, game_state);
+    return result.second;
 }
 
 } // namespace search

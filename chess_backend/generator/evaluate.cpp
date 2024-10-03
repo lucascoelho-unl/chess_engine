@@ -251,7 +251,7 @@ int piece_value(piece::Type type) {
     return 0;
 }
 
-int material_score(piece::Color color, game_state::Game_State &state) {
+int positional_score(piece::Color color, game_state::Game_State &state) {
     board::Board board = state.get_board();
     int side_2_move = (color == piece::Color::WHITE) ? 0 : 1;
 
@@ -277,10 +277,25 @@ int material_score(piece::Color color, game_state::Game_State &state) {
     return (mg_score * mg_phase + eg_score * eg_phase) / 24;
 }
 
-int positional_score(piece::Color color, game_state::Game_State &state) {
+int material_score(piece::Color color, game_state::Game_State &state) {
     board::Board board = state.get_board();
+    int white_material = 0;
+    int black_material = 0;
 
-    return 0;
+    for (int sq = 0; sq < 64; ++sq) {
+        piece::Type type = board.get_piece_type(sq);
+        piece::Color p_color = board.get_piece_color(sq);
+
+        if (type != piece::Type::EMPTY) {
+            int material_value = piece_value(type); // Ensure material value is correct here
+            if (p_color == piece::Color::WHITE) {
+                white_material += material_value;
+            } else {
+                black_material += material_value;
+            }
+        }
+    }
+    return (color == piece::Color::WHITE) ? (white_material - black_material) : (black_material - white_material);
 }
 
 int pawn_structure_score(piece::Color color, game_state::Game_State &state) {
@@ -295,19 +310,19 @@ int king_safety_score(piece::Color color, game_state::Game_State &state) {
     return 0;
 }
 
-int evaluate(game_state::Game_State &state) {
+int evaluate(piece::Color color, game_state::Game_State &state) {
     if (state.is_checkmate()) {
-        return state.turn == piece::Color::WHITE ? -9999999 : 9999999;
+        return 9999999;
     }
     if (state.is_stalemate() || state.is_draw_by_fifty_move_rule()) {
         return 0;
     }
 
     // Evaluate from the perspective of the side to move
-    int score = material_score(state.turn, state);
-    score += positional_score(state.turn, state);
-    score += pawn_structure_score(state.turn, state);
-    score += king_safety_score(state.turn, state);
+    int score = positional_score(color, state);
+    score += material_score(color, state);
+    score += pawn_structure_score(color, state);
+    score += king_safety_score(color, state);
 
     return score;
 }
