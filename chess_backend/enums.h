@@ -5,18 +5,19 @@ namespace chess_engine {
 
 namespace piece {
 enum Type {
-    PAWN,
-    KNIGHT,
-    BISHOP,
-    ROOK,
-    QUEEN,
-    KING,
-    EMPTY
+    PAWN = 0,
+    KNIGHT = 1,
+    BISHOP = 2,
+    ROOK = 3,
+    QUEEN = 4,
+    KING = 5,
+    EMPTY = 6
 };
 
 enum Color {
-    WHITE,
-    BLACK
+    WHITE = 0,
+    BLACK = 1,
+    EMPTY_C = 2
 };
 } // namespace piece
 

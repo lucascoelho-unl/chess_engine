@@ -11,6 +11,7 @@ namespace chess_engine {
 namespace search {
 
 moves::Move find_best_move(int depth, piece::Color color, game_state::Game_State &game_state);
+int minimax(int depth, int alpha, int beta, bool isMaximizingPlayer, game_state::Game_State &game_state);
 
 } // namespace search
 } // namespace chess_engine

@@ -30,7 +30,7 @@ bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board,
 
     bit::Bitboard opponents_pawn_attacks = pawn::get_possible_attacks(utils::opposite_color(color), game_state.get_board().get_pawns(utils::opposite_color(color)));
 
-    bit::Bitboard opponent_attack_mask_without_king = moves::generate_all_piece_moves(utils::opposite_color(color), board, game_state, true);
+    bit::Bitboard opponent_attack_mask_without_king = moves::get_all_piece_moves(utils::opposite_color(color), board, game_state, true);
     bit::Bitboard opponent_attack_mask = opponent_attack_mask_without_king | opponents_king_attacks | opponents_pawn_attacks;
 
     bit::Bitboard safe_moves = legal_moves & ~opponent_attack_mask;

@@ -79,7 +79,7 @@ bit::Bitboard get_all_king_moves(piece::Color color, const board::Board &board, 
 bit::Bitboard get_piece_moves(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
 
 // Generate all valid moves for the specified color
-bit::Bitboard generate_all_piece_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state, bool exclude_king = false);
+bit::Bitboard get_all_piece_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state, bool exclude_king = false);
 
 // Method of generating a list of valid moves for a piece given its move bitboard.
 std::vector<Move> generate_moves_for_piece(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);

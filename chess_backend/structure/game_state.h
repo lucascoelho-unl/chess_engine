@@ -45,6 +45,9 @@ class Game_State {
     Game_State(const board::Board &board, piece::Color turn, bool w_k_castle, bool w_q_castle,
                bool b_k_castle, bool b_q_castle, int en_passant, int halfmove, int fullmove);
 
+    bool is_checkmate();
+    bool is_stalemate();
+    bool is_draw_by_fifty_move_rule();
     bool is_game_over();
     bool is_square_attacked(int sq, piece::Color color) const;
     void switch_turn();

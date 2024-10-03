@@ -1,4 +1,5 @@
 #include "enums.h"
+#include "generator/evaluate.h"
 #include "generator/search.h"
 #include "moves/moves.h"
 #include "structure/bitboard.h"
@@ -6,8 +7,10 @@
 #include "structure/game_state.h"
 #include "structure/square.h"
 #include "utils.h"
+#include <chrono> // For timing
 #include <iostream>
 #include <string>
+#include <thread>
 
 using namespace chess_engine;
 
@@ -57,82 +60,93 @@ piece::Type get_promotion_type() {
     }
 }
 
+const int INF = std::numeric_limits<int>::max();
+const int NEG_INF = std::numeric_limits<int>::min();
+
+// int main() {
+//     // Initialize game state, etc.
+//     std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/QNBQKBNQ w - - 0 1";
+//     //     // std::string fen = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/1NBQK2R w Kkq - 0 1";
+//     //     // std::string fen = "rr2k3/8/8/8/8/8/8/7K w - - 0 1";
+//     //     // std::string fen = "8/2q1P1k1/8/8/8/8/8/K7 w - - 0 1";
+//     //     // std::string fen = "rnqbbnkr/pppppppp/8/8/8/8/PPPPPPPP/RNQBBNKR w - - 0 1";
+
+//     //     // Create the game state from the FEN string
+//     game_state::Game_State game_state = game_state::set_game_state(fen);
+
+//     int evaluation = 0;
+//     if (game_state.turn == piece::Color::WHITE) {
+//         evaluation = chess_engine::search::minimax(3, NEG_INF, INF, true, game_state);
+//     } else {
+//         evaluation = chess_engine::search::minimax(3, NEG_INF, INF, false, game_state);
+//     }
+//     std::cout << "Evaluation: " << evaluation << std::endl;
+
+//     return 0;
+// }
+
 int main() {
     // Initial FEN for starting position
-    std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    // std::string fen = "r1bq1rk1/pppp1pbp/2n2np1/4p3/2B1P3/2NPBN2/PPP2PPP/R2QK2R w KQ - 0 1";
+    std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1";
+    // std::string fen = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/1NBQK2R w Kkq - 0 1";
+    // std::string fen = "rr2k3/8/8/8/8/8/8/7K w - - 0 1";
+    // std::string fen = "8/2q1P1k1/8/8/8/8/8/K7 w - - 0 1";
+    // std::string fen = "rnqbbnkr/pppppppp/8/8/8/8/PPPPPPPP/RNQBBNKR w - - 0 1";
 
     // Create the game state from the FEN string
     game_state::Game_State game_state = game_state::set_game_state(fen);
 
-    // Play a game loop
+    // Play a game loop where the engine plays for both White and Black
     while (true) {
         print_board(game_state);
+        // Display board evaluation after the move
+        int evaluation = evaluate::evaluate(game_state);
+        std::cout << "Current board evaluation: " << evaluation << std::endl;
 
-        // Player's turn (input move)
-        std::string move_input;
-        std::cout << "Your move (e.g., e2e4): ";
-        std::cin >> move_input;
+        // Determine whose turn it is
+        piece::Color current_color = game_state.turn;
+        std::string player = (current_color == piece::Color::WHITE) ? "White" : "Black";
+        std::cout << player << "'s turn (Engine)...\n";
 
-        // Convert input move to integers
-        if (move_input.length() != 4) {
-            std::cout << "Invalid input. Please enter a move in the format 'e2e4'.\n";
-            continue;
-        }
+        // Start timing
+        auto start_time = std::chrono::high_resolution_clock::now();
 
-        int from_square = square::string_position_to_int(move_input.substr(0, 2));
-        int to_square = square::string_position_to_int(move_input.substr(2, 2));
+        moves::Move best_move = search::find_best_move(3, current_color, game_state);
 
-        // Get the piece type and color
-        piece::Type piece_type = game_state.get_board().get_piece_type(from_square, game_state.turn);
-        piece::Color player_color = game_state.turn;
+        // End timing
+        auto end_time = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed_time = end_time - start_time;
 
-        // Get the move type (normal, capture, promotion, etc.)
-        moves::Type move_type = get_move_type();
+        // Output the time taken
+        std::cout << "Time taken for engine to find the best move: " << elapsed_time.count() << " seconds.\n";
 
-        // Get promotion type if it's a promotion move
-        piece::Type promotion = piece::Type::EMPTY;
-        if (move_type == moves::Type::PROMOTION) {
-            promotion = get_promotion_type();
-        }
-
-        // Create the player's move
-        moves::Move player_move(from_square, to_square, piece_type, player_color, move_type, promotion);
-
-        // Attempt to make the player's move
-        if (!game_state.make_move(player_move)) {
-            std::cout << "Invalid move. Try again.\n";
-            continue;
-        }
-
-        // Check for game over
-        if (game_state.is_game_over()) {
-            std::cout << "Game over! You win!\n";
-            break;
-        }
-
-        // AI's turn (engine finds the best move)
-        std::cout << "Engine's turn...\n";
-        moves::Move best_move = search::find_best_move(5, piece::Color::BLACK, game_state); // Assuming depth = 3 for search
-
+        // Output the engine's move
         std::string from_square_str = square::int_position_to_string(best_move.from);
         std::string to_square_str = square::int_position_to_string(best_move.to);
         std::string piece_type_str = utils::piece_type_to_string(best_move.piece_type);
         std::string move_type_str = utils::move_type_to_string(best_move.move_type);
 
-        std::cout << "Engine moves: " << piece_type_str << " from " << from_square_str << " to " << to_square_str << " (" << move_type_str << ")\n";
+        std::cout << player << " move: " << piece_type_str << " from " << from_square_str << " to " << to_square_str << " (" << move_type_str << ")\n";
 
-        // Execute the engine's move
+        // Execute the move
         if (!game_state.make_move(best_move)) {
-            std::cout << "Engine made an invalid move! Something went wrong.\n";
+            std::cout << player << " made an invalid move! Something went wrong.\n";
             break;
         }
 
-        // Check if the engine won
+        // Check for game over
         if (game_state.is_game_over()) {
-            std::cout << "Game over! The engine wins!\n";
+            if (game_state.is_draw_by_fifty_move_rule()) {
+                std::cout << "Game over! Draw" << std::endl;
+            } else {
+                std::cout << "Game over! " << player << " wins!\n";
+            }
+            print_board(game_state);
             break;
         }
+
+        // Pause for 2 seconds before the next move
+        // std::this_thread::sleep_for(std::chrono::seconds(2));
     }
 
     return 0;

@@ -33,6 +33,7 @@ class Board {
   private:
     bit::Bitboard wp, wb, wn, wr, wq, wk = 0ULL; // White pieces
     bit::Bitboard bp, bb, bn, br, bq, bk = 0ULL; // Black pieces
+    bit::Bitboard empty = 0ULL;
 
   public:
     Board(bit::Bitboard wp, bit::Bitboard wb, bit::Bitboard wn, bit::Bitboard wr, bit::Bitboard wq, bit::Bitboard wk,
@@ -168,6 +169,25 @@ class Board {
         return piece::Type::EMPTY;
     }
 
+    inline piece::Type get_piece_type(int sq) {
+        piece::Type curr = get_piece_type(sq, piece::Color::WHITE);
+        if (curr == piece::Type::EMPTY) {
+            return get_piece_type(sq, piece::Color::BLACK);
+        }
+        return curr;
+    }
+
+    inline piece::Color get_piece_color(int sq) {
+        bit::Bitboard mask = (1ULL << sq);
+        if (mask & get_white_pieces()) {
+            return piece::Color::WHITE;
+        }
+        if (mask & get_black_pieces()) {
+            return piece::Color::BLACK;
+        }
+        return piece::Color::EMPTY_C;
+    }
+
     inline bit::Bitboard &get_pieces(piece::Type type, piece::Color color) {
         switch (type) {
         case piece::PAWN:
@@ -183,7 +203,7 @@ class Board {
         case piece::KING:
             return (color == piece::Color::WHITE) ? wk : bk;
         default:
-            throw std::invalid_argument("Invalid piece type");
+            return empty;
         }
     }
 
@@ -203,7 +223,7 @@ class Board {
         case piece::KING:
             return (color == piece::Color::WHITE) ? wk : bk;
         default:
-            throw std::invalid_argument("Invalid piece type");
+            return empty;
         }
     }
 

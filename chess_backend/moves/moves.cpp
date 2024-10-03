@@ -166,7 +166,7 @@ bit::Bitboard get_piece_moves(int from, piece::Type type, piece::Color color, co
 }
 
 // Function to generate all moves for pieces, using the thread pool
-bit::Bitboard generate_all_piece_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state, bool exclude_king) {
+bit::Bitboard get_all_piece_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state, bool exclude_king) {
     bit::Bitboard all_moves = 0ULL;
 
     // Generate moves for all pieces except the king if exclude_king is true
@@ -184,13 +184,14 @@ bit::Bitboard generate_all_piece_moves(piece::Color color, const board::Board &b
 
 std::vector<Move> generate_moves_for_piece(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
     std::vector<Move> moves;
+    moves.reserve(10);
 
     bit::Bitboard attack_bitboard = get_piece_moves(from, type, color, board, game_state);
     bit::Bitboard opponent_occupancy = (color == piece::Color::WHITE) ? board.get_black_pieces() : board.get_white_pieces();
 
     while (attack_bitboard) {
-        int to = __builtin_ffsll(attack_bitboard) - 1; // Find the first set bit
-        attack_bitboard &= attack_bitboard - 1;        // Clear the least significant set bit
+        int to = __builtin_ctzll(attack_bitboard); // Find the first set bit
+        attack_bitboard &= attack_bitboard - 1;    // Clear the least significant set bit
 
         moves::Type move_type = moves::NORMAL;
         piece::Type promotion = piece::Type::EMPTY;
@@ -217,7 +218,7 @@ std::vector<Move> generate_moves_for_piece(int from, piece::Type type, piece::Co
         // Handle castling
         if (type == piece::Type::KING) {
             if ((color == piece::Color::WHITE && from == 4 && (to == 2 || to == 6)) ||
-                (color == piece::Color::BLACK && from == 60 && (to == 56 || to == 63))) {
+                (color == piece::Color::BLACK && from == 60 && (to == 58 || to == 62))) {
                 move_type = moves::CASTLING;
             }
         }
