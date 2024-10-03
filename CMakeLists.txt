@@ -30,4 +30,5 @@ add_executable(chess_engine
     chess_backend/pieces/king.cpp
     chess_backend/generator/evaluate.cpp
     chess_backend/generator/search.cpp
+    chess_backend/generator/order.cpp
 )
