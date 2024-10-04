@@ -13,7 +13,7 @@
 namespace chess_engine {
 namespace king {
 
-bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     bit::Bitboard curr_king = board.get_king(color);
 
     // Return 0 if there's no king at the given position

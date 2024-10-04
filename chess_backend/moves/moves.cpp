@@ -30,7 +30,7 @@ int find_king_square(piece::Color color, const board::Board &board) {
     return __builtin_ffsll(king_bitboard) - 1;
 }
 
-bool is_square_attacked_after_move(int square, piece::Color attacker_color, const Move &move, const board::Board &board, game_state::Game_State &game_state) {
+bool is_square_attacked_after_move(int square, piece::Color attacker_color, const Move &move, const board::Board &board, game_state::GameState &game_state) {
     // Create a copy of the board
     board::Board temp_board = board.copy();
 
@@ -43,38 +43,38 @@ bool is_square_attacked_after_move(int square, piece::Color attacker_color, cons
         temp_board.remove_piece(move.to, utils::opposite_color(move.color));
     }
 
-    game_state::Game_State temp_game_state = game_state::Game_State(temp_board, move.color, false, false, false, false, -1, 0, 0);
+    game_state::GameState temp_game_state = game_state::GameState(temp_board, move.color, false, false, false, false, -1, 0, 0);
 
     // Now check if the square is attacked on this updated board
     return temp_game_state.is_square_attacked(square, move.color);
 }
 
-inline bit::Bitboard get_pawn_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+inline bit::Bitboard get_pawn_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     return pawn::get_moves(from, color, board, game_state);
 }
 
-inline bit::Bitboard get_knight_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+inline bit::Bitboard get_knight_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     return knight::get_moves(from, color, board, game_state);
 }
 
-inline bit::Bitboard get_rook_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+inline bit::Bitboard get_rook_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     return rook::get_moves(from, color, board, game_state);
 }
 
-inline bit::Bitboard get_bishop_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+inline bit::Bitboard get_bishop_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     return bishop::get_moves(from, color, board, game_state);
 }
 
-inline bit::Bitboard get_queen_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+inline bit::Bitboard get_queen_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     return queen::get_moves(from, color, board, game_state);
 }
 
-inline bit::Bitboard get_king_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+inline bit::Bitboard get_king_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     return king::get_moves(from, color, board, game_state);
 }
 
 template <typename Get_Moves_Func>
-bit::Bitboard get_all_moves(piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state, Get_Moves_Func get_moves) {
+bit::Bitboard get_all_moves(piece::Type type, piece::Color color, const board::Board &board, const game_state::GameState &game_state, Get_Moves_Func get_moves) {
     bit::Bitboard all_moves = 0ULL;
     bit::Bitboard curr_pieces = board.get_pieces(type, color);
 
@@ -87,7 +87,7 @@ bit::Bitboard get_all_moves(piece::Type type, piece::Color color, const board::B
     return all_moves;
 }
 
-bit::Bitboard get_all_moves_for_piece(piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+bit::Bitboard get_all_moves_for_piece(piece::Type type, piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     switch (type) {
     case piece::Type::PAWN:
         return get_all_moves(type, color, board, game_state, get_pawn_moves);
@@ -110,31 +110,31 @@ inline bool is_piece_at_position(int from, bit::Bitboard piece_positions) {
     return (piece_positions & (1ULL << from)) != 0;
 }
 
-bit::Bitboard get_all_pawn_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+bit::Bitboard get_all_pawn_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     return get_all_moves(piece::Type::PAWN, color, board, game_state, get_pawn_moves);
 }
 
-bit::Bitboard get_all_knight_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+bit::Bitboard get_all_knight_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     return get_all_moves(piece::Type::KNIGHT, color, board, game_state, get_knight_moves);
 }
 
-bit::Bitboard get_all_bishop_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+bit::Bitboard get_all_bishop_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     return get_all_moves(piece::Type::BISHOP, color, board, game_state, get_bishop_moves);
 }
 
-bit::Bitboard get_all_rook_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+bit::Bitboard get_all_rook_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     return get_all_moves(piece::Type::ROOK, color, board, game_state, get_rook_moves);
 }
 
-bit::Bitboard get_all_queen_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+bit::Bitboard get_all_queen_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     return get_all_moves(piece::Type::QUEEN, color, board, game_state, get_queen_moves);
 }
 
-bit::Bitboard get_all_king_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+bit::Bitboard get_all_king_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     return get_all_moves(piece::Type::KING, color, board, game_state, get_king_moves);
 }
 
-bit::Bitboard get_piece_moves(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+bit::Bitboard get_piece_moves(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     bit::Bitboard moves = 0ULL;
     bit::Bitboard current_piece_positions = board.get_pieces(type, color);
 
@@ -166,7 +166,7 @@ bit::Bitboard get_piece_moves(int from, piece::Type type, piece::Color color, co
 }
 
 // Function to generate all moves for pieces, using the thread pool
-bit::Bitboard get_all_piece_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state, bool exclude_king) {
+bit::Bitboard get_all_piece_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state, bool exclude_king) {
     bit::Bitboard all_moves = 0ULL;
 
     // Generate moves for all pieces except the king if exclude_king is true
@@ -182,7 +182,7 @@ bit::Bitboard get_all_piece_moves(piece::Color color, const board::Board &board,
     return all_moves;
 }
 
-std::vector<Move> generate_moves_for_piece(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+std::vector<Move> generate_moves_for_piece(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     std::vector<Move> moves;
     moves.reserve(10);
 
@@ -229,7 +229,7 @@ std::vector<Move> generate_moves_for_piece(int from, piece::Type type, piece::Co
     return moves;
 }
 
-std::vector<Move> generate_pseudo_legal_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+std::vector<Move> generate_pseudo_legal_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     std::vector<Move> all_moves;
 
     // Loop through each piece type
@@ -252,7 +252,7 @@ std::vector<Move> generate_pseudo_legal_moves(piece::Color color, const board::B
     return all_moves;
 }
 
-std::vector<Move> generate_legal_moves(piece::Color color, game_state::Game_State &game_state) {
+std::vector<Move> generate_legal_moves(piece::Color color, game_state::GameState &game_state) {
     std::vector<Move> legal_moves;
     legal_moves.reserve(218);
 

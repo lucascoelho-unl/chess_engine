@@ -9,7 +9,7 @@
 namespace chess_engine {
 namespace order {
 
-std::vector<moves::Move> order_moves(const std::vector<moves::Move> &moves, const game_state::Game_State &game_state) {
+std::vector<moves::Move> order_moves(const std::vector<moves::Move> &moves, const game_state::GameState &game_state) {
     std::vector<std::pair<int, moves::Move>> scored_moves;
     scored_moves.reserve(moves.size());
 

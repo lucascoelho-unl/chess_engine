@@ -10,7 +10,7 @@
 namespace chess_engine {
 namespace evaluate {
 
-int evaluate(piece::Color color, game_state::Game_State &state);
+int evaluate(piece::Color color, game_state::GameState &state);
 int piece_value(piece::Type type);
 
 } // namespace evaluate

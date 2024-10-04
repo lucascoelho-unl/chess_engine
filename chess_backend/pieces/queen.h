@@ -9,7 +9,7 @@
 namespace chess_engine {
 namespace queen {
 
-bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
+bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state);
 
 } // namespace queen
 } // namespace chess_engine

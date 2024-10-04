@@ -9,7 +9,7 @@
 namespace chess_engine {
 namespace rook {
 
-bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     bit::Bitboard rook_positions = board.get_rooks(color);
     if (((1ULL << from) & rook_positions) == 0) {
         return 0ULL;

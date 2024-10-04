@@ -13,7 +13,7 @@
 namespace chess_engine {
 namespace game_state {
 
-class Game_State {
+class GameState {
   public:
     board::Board board;          // The current state of the chessboard
     piece::Color turn;           // Whose turn it is (White or Black)
@@ -25,7 +25,7 @@ class Game_State {
     int halfmove_clock;          // Number of half-moves since the last pawn move or capture
     int fullmove_number;         // The current move number (increases after Black's move)
 
-    bool operator==(const Game_State &other) const {
+    bool operator==(const GameState &other) const {
         return board == other.board &&
                turn == other.turn &&
                white_castle_kingside == other.white_castle_kingside &&
@@ -40,10 +40,10 @@ class Game_State {
     // Stack to store previous game states (useful for unmaking moves)
     std::deque<moves::Reversible_Move> move_history;
 
-    Game_State() = default; // Default constructor
+    GameState() = default; // Default constructor
 
-    Game_State(const board::Board &board, piece::Color turn, bool w_k_castle, bool w_q_castle,
-               bool b_k_castle, bool b_q_castle, int en_passant, int halfmove, int fullmove);
+    GameState(const board::Board &board, piece::Color turn, bool w_k_castle, bool w_q_castle,
+              bool b_k_castle, bool b_q_castle, int en_passant, int halfmove, int fullmove);
 
     bool is_checkmate();
     bool is_stalemate();
@@ -55,7 +55,7 @@ class Game_State {
     void update_en_passant(int from, int to);
     bool is_castling_valid(int from, int to, piece::Color color) const;
     const bool is_in_check(piece::Color color) const;
-    Game_State copy() const;
+    GameState copy() const;
 
     bool make_move(moves::Move move);
     bool make_pseudo_move(moves::Move move);
@@ -73,7 +73,7 @@ class Game_State {
 };
 
 // Function declarations
-Game_State set_game_state(const std::string &fen);
+GameState set_game_state(const std::string &fen);
 
 } // namespace game_state
 } // namespace chess_engine

@@ -11,7 +11,7 @@
 namespace chess_engine {
 namespace game_state {
 
-class Game_State; // Forward declare Game_State
+class GameState; // Forward declare GameState
 
 } // namespace game_state
 
@@ -60,35 +60,35 @@ struct Reversible_Move {
 };
 
 // Get moves from a specific square for a piece of the specified color
-bit::Bitboard get_pawn_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
-bit::Bitboard get_knight_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
-bit::Bitboard get_bishop_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
-bit::Bitboard get_rook_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
-bit::Bitboard get_queen_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
-bit::Bitboard get_king_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
+bit::Bitboard get_pawn_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state);
+bit::Bitboard get_knight_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state);
+bit::Bitboard get_bishop_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state);
+bit::Bitboard get_rook_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state);
+bit::Bitboard get_queen_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state);
+bit::Bitboard get_king_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state);
 
 // Get all possible moves for the specified color
-bit::Bitboard get_all_pawn_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
-bit::Bitboard get_all_knight_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
-bit::Bitboard get_all_bishop_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
-bit::Bitboard get_all_rook_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
-bit::Bitboard get_all_queen_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
-bit::Bitboard get_all_king_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
+bit::Bitboard get_all_pawn_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state);
+bit::Bitboard get_all_knight_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state);
+bit::Bitboard get_all_bishop_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state);
+bit::Bitboard get_all_rook_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state);
+bit::Bitboard get_all_queen_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state);
+bit::Bitboard get_all_king_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state);
 
 // General function to get moves for any piece type
-bit::Bitboard get_piece_moves(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
+bit::Bitboard get_piece_moves(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::GameState &game_state);
 
 // Generate all valid moves for the specified color
-bit::Bitboard get_all_piece_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state, bool exclude_king = false);
+bit::Bitboard get_all_piece_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state, bool exclude_king = false);
 
 // Method of generating a list of valid moves for a piece given its move bitboard.
-std::vector<Move> generate_moves_for_piece(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
+std::vector<Move> generate_moves_for_piece(int from, piece::Type type, piece::Color color, const board::Board &board, const game_state::GameState &game_state);
 
 // Extract all possible moves for all pieces and returns a list of them.
-std::vector<Move> generate_pseudo_legal_moves(piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
+std::vector<Move> generate_pseudo_legal_moves(piece::Color color, const board::Board &board, const game_state::GameState &game_state);
 
 // Get only legal moves, no moves that leave the king in check are left here.
-std::vector<moves::Move> generate_legal_moves(piece::Color color, game_state::Game_State &game_state);
+std::vector<moves::Move> generate_legal_moves(piece::Color color, game_state::GameState &game_state);
 
 std::string to_string(const Move &move);
 

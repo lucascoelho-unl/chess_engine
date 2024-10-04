@@ -27,7 +27,7 @@ extern transposition::TranspositionTable tt;
 // Add a global transposition table
 transposition::TranspositionTable tt(64); // 64 MB table
 
-std::pair<int, moves::Move> negamax(int depth, int alpha, int beta, piece::Color color, game_state::Game_State &game_state) {
+std::pair<int, moves::Move> negamax(int depth, int alpha, int beta, piece::Color color, game_state::GameState &game_state) {
     uint64_t hash = zobrist::compute_hash(game_state);
 
     // Probe the transposition table
@@ -95,7 +95,7 @@ std::pair<int, moves::Move> negamax(int depth, int alpha, int beta, piece::Color
     return {maxEval, best_move};
 }
 
-moves::Move find_best_move(int depth, piece::Color color, game_state::Game_State &game_state) {
+moves::Move find_best_move(int depth, piece::Color color, game_state::GameState &game_state) {
     // Find the best move using negamax with alpha-beta pruning
     std::pair<int, moves::Move> result = negamax(depth, NEG_INF, INF, color, game_state);
     return result.second;
@@ -103,7 +103,7 @@ moves::Move find_best_move(int depth, piece::Color color, game_state::Game_State
 
 moves::Move calculate_best_move(const std::string &fen) {
     // Initialize a board with the given FEN
-    game_state::Game_State state = game_state::set_game_state(fen);
+    game_state::GameState state = game_state::set_game_state(fen);
 
     // Use the search algorithm to find the best move
     moves::Move best_move = find_best_move(4, state.turn, state);

@@ -31,7 +31,7 @@ void init_zobrist_keys() {
     side_to_move_key = dis(gen);
 }
 
-uint64_t compute_hash(const game_state::Game_State &state) {
+uint64_t compute_hash(const game_state::GameState &state) {
     uint64_t hash = 0;
 
     // Hash pieces

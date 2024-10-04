@@ -43,7 +43,7 @@ constexpr std::array<bit::Bitboard, 64> calculate_king_moves() {
 
 constexpr std::array<bit::Bitboard, 64> king_moves = calculate_king_moves();
 
-bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state);
+bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state);
 
 } // namespace king
 } // namespace chess_engine

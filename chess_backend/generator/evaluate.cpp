@@ -251,7 +251,7 @@ int piece_value(piece::Type type) {
     return 0;
 }
 
-int positional_score(piece::Color color, game_state::Game_State &state) {
+int positional_score(piece::Color color, game_state::GameState &state) {
     board::Board board = state.get_board();
     int side_2_move = (color == piece::Color::WHITE) ? 0 : 1;
 
@@ -277,7 +277,7 @@ int positional_score(piece::Color color, game_state::Game_State &state) {
     return (mg_score * mg_phase + eg_score * eg_phase) / 24;
 }
 
-int material_score(piece::Color color, game_state::Game_State &state) {
+int material_score(piece::Color color, game_state::GameState &state) {
     board::Board board = state.get_board();
     int white_material = 0;
     int black_material = 0;
@@ -298,19 +298,19 @@ int material_score(piece::Color color, game_state::Game_State &state) {
     return (color == piece::Color::WHITE) ? (white_material - black_material) : (black_material - white_material);
 }
 
-int pawn_structure_score(piece::Color color, game_state::Game_State &state) {
+int pawn_structure_score(piece::Color color, game_state::GameState &state) {
     board::Board board = state.get_board();
 
     return 0;
 }
 
-int king_safety_score(piece::Color color, game_state::Game_State &state) {
+int king_safety_score(piece::Color color, game_state::GameState &state) {
     board::Board board = state.get_board();
 
     return 0;
 }
 
-int evaluate(piece::Color color, game_state::Game_State &state) {
+int evaluate(piece::Color color, game_state::GameState &state) {
     if (state.is_checkmate()) {
         return 9999999;
     }

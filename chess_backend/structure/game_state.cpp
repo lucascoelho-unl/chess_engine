@@ -11,14 +11,14 @@
 namespace chess_engine {
 namespace game_state {
 
-Game_State::Game_State(const board::Board &board, piece::Color turn, bool w_k_castle, bool w_q_castle,
-                       bool b_k_castle, bool b_q_castle, int en_passant, int halfmove, int fullmove)
+GameState::GameState(const board::Board &board, piece::Color turn, bool w_k_castle, bool w_q_castle,
+                     bool b_k_castle, bool b_q_castle, int en_passant, int halfmove, int fullmove)
     : board(board), turn(turn), white_castle_kingside(w_k_castle),
       white_castle_queenside(w_q_castle), black_castle_kingside(b_k_castle),
       black_castle_queenside(b_q_castle), en_passant_square(en_passant),
       halfmove_clock(halfmove), fullmove_number(fullmove) {}
 
-const bool Game_State::is_in_check(piece::Color color) const {
+const bool GameState::is_in_check(piece::Color color) const {
     bit::Bitboard opposite_team_attacks = moves::get_all_piece_moves(utils::opposite_color(color), board, *this);
     bit::Bitboard current_king_position = board.get_king(color);
 
@@ -28,7 +28,7 @@ const bool Game_State::is_in_check(piece::Color color) const {
     return false;
 }
 
-bool Game_State::is_checkmate() {
+bool GameState::is_checkmate() {
     // Check if the current player is in check
     if (!is_in_check(turn)) {
         return false;
@@ -41,7 +41,7 @@ bool Game_State::is_checkmate() {
     return possible_moves.empty();
 }
 
-bool Game_State::is_stalemate() {
+bool GameState::is_stalemate() {
     // Check if the current player is not in check
     if (is_in_check(turn)) {
         return false;
@@ -54,12 +54,12 @@ bool Game_State::is_stalemate() {
     return possible_moves.empty();
 }
 
-bool Game_State::is_draw_by_fifty_move_rule() {
+bool GameState::is_draw_by_fifty_move_rule() {
     // Check for 50-move rule (halfmove_clock is reset after captures and pawn moves)
     return halfmove_clock >= 100;
 }
 
-bool Game_State::is_game_over() {
+bool GameState::is_game_over() {
     if (is_checkmate()) {
         return true;
     }
@@ -79,7 +79,7 @@ bool Game_State::is_game_over() {
     return false;
 }
 
-bool Game_State::is_square_attacked(int sq, piece::Color color) const {
+bool GameState::is_square_attacked(int sq, piece::Color color) const {
     bit::Bitboard attacked_squares = 0ULL;
 
     // Generate moves for all pieces except the king                                                exclude king
@@ -94,11 +94,11 @@ bool Game_State::is_square_attacked(int sq, piece::Color color) const {
     return (((1ULL << sq) & attacked_squares) != 0);
 }
 
-void Game_State::switch_turn() {
+void GameState::switch_turn() {
     turn = (turn == piece::WHITE) ? piece::BLACK : piece::WHITE;
 }
 
-void Game_State::update_castling_rights(int from, int to) {
+void GameState::update_castling_rights(int from, int to) {
     // If the king moves, lose castling rights
     if (board.get_piece_type(from, turn) == piece::KING) {
         if (turn == piece::WHITE) {
@@ -134,7 +134,7 @@ void Game_State::update_castling_rights(int from, int to) {
     }
 }
 
-void Game_State::update_en_passant(int from, int to) {
+void GameState::update_en_passant(int from, int to) {
     en_passant_square = -1; // Reset en passant by default
     // If a pawn moves two squares, set up en passant square
     if (board.get_piece_type(from, turn) == piece::PAWN) {
@@ -144,7 +144,7 @@ void Game_State::update_en_passant(int from, int to) {
     }
 }
 
-bool Game_State::is_castling_valid(int from, int to, piece::Color color) const {
+bool GameState::is_castling_valid(int from, int to, piece::Color color) const {
 
     // Ensure that the move is either kingside or queenside castling
     if (!(to == square::G1 || to == square::C1 || to == square::G8 || to == square::C8)) {
@@ -189,19 +189,19 @@ bool Game_State::is_castling_valid(int from, int to, piece::Color color) const {
     return false; // Invalid castling move
 }
 
-Game_State Game_State::copy() const {
-    return Game_State(this->board.copy(),
-                      this->turn,
-                      this->white_castle_kingside,
-                      this->white_castle_queenside,
-                      this->black_castle_kingside,
-                      this->black_castle_queenside,
-                      this->en_passant_square,
-                      this->halfmove_clock,
-                      this->fullmove_number);
+GameState GameState::copy() const {
+    return GameState(this->board.copy(),
+                     this->turn,
+                     this->white_castle_kingside,
+                     this->white_castle_queenside,
+                     this->black_castle_kingside,
+                     this->black_castle_queenside,
+                     this->en_passant_square,
+                     this->halfmove_clock,
+                     this->fullmove_number);
 }
 
-bool Game_State::make_move(moves::Move move) {
+bool GameState::make_move(moves::Move move) {
     int from = move.from;
     int to = move.to;
     piece::Type piece_type = move.piece_type;
@@ -363,7 +363,7 @@ bool Game_State::make_move(moves::Move move) {
     return true;
 }
 
-bool Game_State::unmake_move() {
+bool GameState::unmake_move() {
     if (move_history.empty())
         return false;
 
@@ -412,7 +412,7 @@ bool Game_State::unmake_move() {
     return true;
 }
 
-Game_State set_game_state(const std::string &fen) {
+GameState set_game_state(const std::string &fen) {
     std::istringstream fen_stream(fen);
     std::string piece_placement, active_color_str, castling_rights, en_passant_target;
     int halfmove_clock, fullmove_number;
@@ -438,10 +438,10 @@ Game_State set_game_state(const std::string &fen) {
         en_passant_square = square::string_to_square(en_passant_target);
     }
 
-    // Create and return the Game_State object
-    return Game_State(board, turn, white_castle_kingside, white_castle_queenside,
-                      black_castle_kingside, black_castle_queenside, en_passant_square,
-                      halfmove_clock, fullmove_number);
+    // Create and return the GameState object
+    return GameState(board, turn, white_castle_kingside, white_castle_queenside,
+                     black_castle_kingside, black_castle_queenside, en_passant_square,
+                     halfmove_clock, fullmove_number);
 }
 
 } // namespace game_state

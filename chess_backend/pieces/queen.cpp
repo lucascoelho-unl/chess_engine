@@ -11,7 +11,7 @@
 namespace chess_engine {
 namespace queen {
 
-bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board, const game_state::Game_State &game_state) {
+bit::Bitboard get_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     bit::Bitboard queen_position = board.get_queens(color);
     if (((1ULL << from) & queen_position) == 0) {
         return 0ULL;
