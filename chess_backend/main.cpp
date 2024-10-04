@@ -1,5 +1,7 @@
 #include "enums.h"
 #include "generator/search.h"
+#include "generator/transposition.h"
+#include "generator/zobrist.h"
 #include "moves/moves.h"
 #include "structure/square.h"
 #include <boost/asio/ip/tcp.hpp>
@@ -21,6 +23,9 @@ namespace http = beast::http;     // From <boost/beast/http.hpp>
 namespace net = boost::asio;      // From <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp; // From <boost/asio/ip/tcp.hpp>
 using namespace chess_engine;
+
+// Global transposition table
+transposition::TranspositionTable tt(64); // 64 MB table
 
 // Function to handle CORS and respond to POST requests
 void handle_request(http::request<http::string_body> &&req, http::response<http::string_body> &res) {
@@ -97,6 +102,9 @@ void do_session(tcp::socket socket) {
 }
 
 int main() {
+    // Initialize Zobrist keys
+    zobrist::init_zobrist_keys();
+
     try {
         auto const address = net::ip::make_address("0.0.0.0");
         unsigned short port = 18080;
@@ -105,7 +113,7 @@ int main() {
         tcp::acceptor acceptor{ioc, {address, port}};
         tcp::socket socket{ioc};
 
-        std::cout << "Server is running on port 18080...\n";
+        std::cout << "Server is running on port 18080.\n";
 
         for (;;) {
             // Wait for a connection
