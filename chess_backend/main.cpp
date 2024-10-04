@@ -1,131 +1,123 @@
 #include "enums.h"
-#include "generator/evaluate.h"
 #include "generator/search.h"
 #include "moves/moves.h"
-#include "structure/bitboard.h"
-#include "structure/board.h"
-#include "structure/game_state.h"
 #include "structure/square.h"
-#include "utils.h"
-#include <chrono> // For timing
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/strand.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/http.hpp>
+#include <boost/beast/version.hpp>
+#include <boost/config.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <cstdlib>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <thread>
 
+namespace beast = boost::beast;   // From <boost/beast.hpp>
+namespace http = beast::http;     // From <boost/beast/http.hpp>
+namespace net = boost::asio;      // From <boost/asio.hpp>
+using tcp = boost::asio::ip::tcp; // From <boost/asio/ip/tcp.hpp>
 using namespace chess_engine;
 
-void print_board(const game_state::Game_State &game_state) {
-    std::cout << game_state.get_board().to_string() << std::endl;
+// Function to handle CORS and respond to POST requests
+void handle_request(http::request<http::string_body> &&req, http::response<http::string_body> &res) {
+    if (req.method() == http::verb::options) {
+        // Handle preflight request (CORS)
+        res.result(http::status::no_content);
+        res.set(http::field::access_control_allow_origin, "*");
+        res.set(http::field::access_control_allow_methods, "POST, OPTIONS");
+        res.set(http::field::access_control_allow_headers, "Content-Type, Authorization");
+        return;
+    }
+
+    if (req.method() == http::verb::post) {
+        // Parse the JSON body
+        std::string body = req.body();
+        std::istringstream iss(body);
+        boost::property_tree::ptree pt;
+
+        // Parse the JSON body into a property tree
+        try {
+            boost::property_tree::read_json(iss, pt);
+
+            // Extract the FEN string
+            std::string fen = pt.get<std::string>("fen");
+
+            // Calculate the best move from the FEN string
+            moves::Move best_move = search::calculate_best_move(fen);
+
+            // Convert the move positions to chess notation strings using square::int_position_to_string
+            std::string from_str = square::int_position_to_string(best_move.from);
+            std::string to_str = square::int_position_to_string(best_move.to);
+
+            // Respond with the move in JSON format
+            std::string response_body = "{\"from\": \"" + from_str + "\", \"to\": \"" + to_str + "\"}";
+            res.body() = response_body;
+            res.set(http::field::content_type, "application/json");
+            res.set(http::field::access_control_allow_origin, "*"); // Handle CORS
+            res.prepare_payload();
+            res.result(http::status::ok);
+        } catch (const std::exception &e) {
+            // Handle JSON parsing errors
+            res.result(http::status::bad_request);
+            res.body() = "Invalid JSON format";
+            res.prepare_payload();
+        }
+        return;
+    }
+
+    res.result(http::status::bad_request);
+    res.body() = "Invalid request";
+    res.prepare_payload();
 }
 
-// Function to get the move type from the player's input
-moves::Type get_move_type() {
-    std::string move_type_input;
-    std::cout << "Enter the move type (normal, capture, promotion, castling, en_passant): ";
-    std::cin >> move_type_input;
+// This function will run a single connection session
+void do_session(tcp::socket socket) {
+    try {
+        beast::flat_buffer buffer;
+        http::request<http::string_body> req;
 
-    if (move_type_input == "normal") {
-        return moves::Type::NORMAL;
-    } else if (move_type_input == "capture") {
-        return moves::Type::CAPTURE;
-    } else if (move_type_input == "promotion") {
-        return moves::Type::PROMOTION;
-    } else if (move_type_input == "castling") {
-        return moves::Type::CASTLING;
-    } else if (move_type_input == "en_passant") {
-        return moves::Type::EN_PASSANT;
-    } else {
-        std::cout << "Invalid move type. Defaulting to normal move.\n";
-        return moves::Type::NORMAL;
+        // Read the request
+        http::read(socket, buffer, req);
+
+        // Create a response
+        http::response<http::string_body> res;
+
+        // Handle the request and generate a response
+        handle_request(std::move(req), res);
+
+        // Send the response
+        http::write(socket, res);
+    } catch (std::exception const &e) {
+        std::cerr << "Error: " << e.what() << "\n";
     }
 }
-
-// Function to get the promotion type if the move is a promotion
-piece::Type get_promotion_type() {
-    std::string promotion_input;
-    std::cout << "Enter the promotion piece (queen, rook, bishop, knight): ";
-    std::cin >> promotion_input;
-
-    if (promotion_input == "queen") {
-        return piece::Type::QUEEN;
-    } else if (promotion_input == "rook") {
-        return piece::Type::ROOK;
-    } else if (promotion_input == "bishop") {
-        return piece::Type::BISHOP;
-    } else if (promotion_input == "knight") {
-        return piece::Type::KNIGHT;
-    } else {
-        std::cout << "Invalid promotion type. Defaulting to queen.\n";
-        return piece::Type::QUEEN;
-    }
-}
-
-const int INF = std::numeric_limits<int>::max();
-const int NEG_INF = std::numeric_limits<int>::min();
 
 int main() {
-    // Initial FEN for starting position
-    // std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1";
-    // std::string fen = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/1NBQK2R w Kkq - 0 1";
-    // std::string fen = "rr2k3/8/8/8/8/8/8/7K w - - 0 1";
-    // std::string fen = "8/2q1P1k1/8/8/8/8/8/K7 w - - 0 1";
-    std::string fen = "bbrqnnkr/pppppppp/8/8/8/8/PPPPPPPP/BBRQNNKR w - - 0 1";
+    try {
+        auto const address = net::ip::make_address("0.0.0.0");
+        unsigned short port = 18080;
 
-    // Create the game state from the FEN string
-    game_state::Game_State game_state = game_state::set_game_state(fen);
+        net::io_context ioc{1};
+        tcp::acceptor acceptor{ioc, {address, port}};
+        tcp::socket socket{ioc};
 
-    // Play a game loop where the engine plays for both White and Black
-    while (true) {
-        print_board(game_state);
-        // Display board evaluation after the move
-        int evaluation = evaluate::evaluate(game_state.turn, game_state);
-        std::cout << "Current board evaluation: " << game_state.turn << " " << evaluation << std::endl;
+        std::cout << "Server is running on port 18080...\n";
 
-        // Determine whose turn it is
-        bool current_color = (game_state.turn == piece::Color::WHITE);
-        std::string player = (current_color) ? "White" : "Black";
-        std::cout << player << "'s turn (Engine)...\n";
+        for (;;) {
+            // Wait for a connection
+            acceptor.accept(socket);
 
-        // Start timing
-        auto start_time = std::chrono::high_resolution_clock::now();
-
-        moves::Move best_move = search::find_best_move(4, game_state.turn, game_state);
-
-        // End timing
-        auto end_time = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> elapsed_time = end_time - start_time;
-
-        // Output the time taken
-        std::cout << "Time taken for engine to find the best move: " << elapsed_time.count() << " seconds.\n";
-
-        // Output the engine's move
-        std::string from_square_str = square::int_position_to_string(best_move.from);
-        std::string to_square_str = square::int_position_to_string(best_move.to);
-        std::string piece_type_str = utils::piece_type_to_string(best_move.piece_type);
-        std::string move_type_str = utils::move_type_to_string(best_move.move_type);
-
-        std::cout << player << " move: " << piece_type_str << " from " << from_square_str << " to " << to_square_str << " (" << move_type_str << ")\n";
-
-        // Execute the move
-        if (!game_state.make_move(best_move)) {
-            std::cout << player << " made an invalid move! Something went wrong.\n";
-            break;
+            // Handle the session
+            std::thread([socket = std::move(socket)]() mutable {
+                do_session(std::move(socket));
+            }).detach();
         }
-
-        // Check for game over
-        if (game_state.is_game_over()) {
-            if (game_state.is_draw_by_fifty_move_rule()) {
-                std::cout << "Game over! Draw" << std::endl;
-            } else {
-                std::cout << "Game over! " << player << " wins!\n";
-            }
-            print_board(game_state);
-            break;
-        }
-
-        // Pause for 2 seconds before the next move
-        // std::this_thread::sleep_for(std::chrono::seconds(2));
+    } catch (std::exception const &e) {
+        std::cerr << "Error: " << e.what() << "\n";
+        return EXIT_FAILURE;
     }
-
-    return 0;
 }

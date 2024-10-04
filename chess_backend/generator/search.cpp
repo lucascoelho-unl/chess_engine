@@ -58,5 +58,16 @@ moves::Move find_best_move(int depth, piece::Color color, game_state::Game_State
     return result.second;
 }
 
+moves::Move calculate_best_move(const std::string &fen) {
+    // Initialize a board with the given FEN
+    game_state::Game_State state = game_state::set_game_state(fen);
+
+    // Use the search algorithm to find the best move
+    moves::Move best_move = find_best_move(4, state.turn, state);
+
+    // Convert the best move to a string (e.g., e2e4)
+    return best_move;
+}
+
 } // namespace search
 } // namespace chess_engine

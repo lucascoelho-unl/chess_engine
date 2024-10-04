@@ -12,6 +12,8 @@ namespace search {
 
 moves::Move find_best_move(int depth, piece::Color color, game_state::Game_State &game_state);
 
+moves::Move calculate_best_move(const std::string &fen);
+
 } // namespace search
 } // namespace chess_engine
 
