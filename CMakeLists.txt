@@ -56,6 +56,8 @@ add_executable(chess_engine
     chess_backend/generator/evaluate.cpp
     chess_backend/generator/search.cpp
     chess_backend/generator/order.cpp
+    chess_backend/generator/transposition.cpp
+    chess_backend/generator/zobrist.cpp
 )
 
 # Link Crow, Boost, and pthread to the chess_engine executable (all using the keyword signature)

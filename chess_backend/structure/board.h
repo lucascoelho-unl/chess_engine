@@ -169,7 +169,7 @@ class Board {
         return piece::Type::EMPTY;
     }
 
-    inline piece::Type get_piece_type(int sq) {
+    inline piece::Type get_piece_type(int sq) const {
         piece::Type curr = get_piece_type(sq, piece::Color::WHITE);
         if (curr == piece::Type::EMPTY) {
             return get_piece_type(sq, piece::Color::BLACK);
@@ -177,7 +177,7 @@ class Board {
         return curr;
     }
 
-    inline piece::Color get_piece_color(int sq) {
+    inline piece::Color get_piece_color(int sq) const {
         bit::Bitboard mask = (1ULL << sq);
         if (mask & get_white_pieces()) {
             return piece::Color::WHITE;

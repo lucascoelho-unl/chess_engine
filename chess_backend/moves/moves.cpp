@@ -49,6 +49,18 @@ bool is_square_attacked_after_move(int square, piece::Color attacker_color, cons
     return temp_game_state.is_square_attacked(square, move.color);
 }
 
+bool Move::operator==(const Move &other) const {
+    return from == other.from && to == other.to && promotion == other.promotion;
+}
+
+bool Move::operator!=(const Move &other) const {
+    return !(*this == other);
+}
+
+bool Move::is_null() const {
+    return from == -1 && to == -1;
+}
+
 inline bit::Bitboard get_pawn_moves(int from, piece::Color color, const board::Board &board, const game_state::GameState &game_state) {
     return pawn::get_moves(from, color, board, game_state);
 }

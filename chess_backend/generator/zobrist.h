@@ -4,6 +4,7 @@
 #include "../enums.h"
 #include <array>
 #include <cstdint>
+#include "../structure/game_state.h"
 
 namespace chess_engine {
 namespace zobrist {

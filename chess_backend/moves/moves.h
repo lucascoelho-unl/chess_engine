@@ -30,7 +30,9 @@ struct Move {
     Move(int from, int to, piece::Type piece_type, piece::Color color, moves::Type move_type = moves::Type::NORMAL, piece::Type promotion = piece::Type::EMPTY)
         : from(from), to(to), piece_type(piece_type), color(color), move_type(move_type), promotion(promotion) {}
 
-    // Define the less-than operator
+    // Define operators
+    bool operator==(const Move &other) const;
+    bool operator!=(const Move &other) const;
     bool operator<(const Move &other) const {
         if (from != other.from)
             return from < other.from;
@@ -44,6 +46,8 @@ struct Move {
             return move_type < other.move_type;
         return promotion < other.promotion;
     }
+
+    bool is_null() const;
 };
 
 struct Reversible_Move {

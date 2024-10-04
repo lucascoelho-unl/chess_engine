@@ -1,4 +1,5 @@
 #include "zobrist.h"
+#include "../structure/game_state.h"
 #include <random>
 
 namespace chess_engine {
