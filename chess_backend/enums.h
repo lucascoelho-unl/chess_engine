@@ -46,6 +46,16 @@ enum Square {
 // clang-format on
 } // namespace square
 
+namespace transposition {
+
+enum class NodeType {
+    EXACT,
+    ALPHA,
+    BETA
+};
+
+}
+
 } // namespace chess_engine
 
 #endif
