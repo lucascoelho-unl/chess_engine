@@ -1,6 +1,6 @@
 # Project planning
 
-Hey Chat! I'm currently developing a project of a chess engine, and it is in progress. I'd like you to be my tutor for this project, and guide me trough steps for completing it. It is extremelly important that you don't give me code, just small snippets of function names if necessairy, but I want to do it on my own. The current project planning can be seen below: 
+I'm currently developing a project of a chess engine, and it is in progress. Below is the planning for making the engine and board ui.
 
 1. Board Representation
 - Implement bitboard data structure

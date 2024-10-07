@@ -1,6 +1,8 @@
 #include "../enums.h"
 #include "../structure/board.h"
 #include "../structure/game_state.h"
+#include "order.h"
+#include <limits>
 
 namespace chess_engine {
 namespace evaluate {
@@ -229,7 +231,6 @@ constexpr auto init_eg_table() {
     return eg_table;
 }
 
-// Use the constexpr functions to initialize the tables
 constexpr auto mg_table = init_mg_table();
 constexpr auto eg_table = init_eg_table();
 
@@ -249,6 +250,89 @@ int piece_value(piece::Type type) {
         return 20000;
     }
     return 0;
+}
+
+constexpr int PIECE_VALUES[7] = {100, 300, 300, 500, 900, 20000, 0}; // Pawn, Knight, Bishop, Rook, Queen, King, Empty
+
+int get_least_valuable_attacker(const game_state::GameState &state, int square, piece::Color color, int &from_square) {
+    // Order of piece values: Pawn, Knight, Bishop, Rook, Queen, King
+    std::vector<piece::Type> piece_order = {
+        piece::Type::PAWN, piece::Type::KNIGHT, piece::Type::BISHOP,
+        piece::Type::ROOK, piece::Type::QUEEN, piece::Type::KING};
+
+    board::Board board = state.get_board();
+
+    for (piece::Type piece : piece_order) {
+        bit::Bitboard piece_positions = board.get_pieces(piece, color);
+
+        while (piece_positions) {
+            int from = __builtin_ctzll(piece_positions);
+            piece_positions &= piece_positions - 1;
+            bit::Bitboard moves = moves::get_piece_moves(from, piece, color, board, state);
+            if (moves & (1ULL << square)) {
+                return piece;
+            }
+        }
+    }
+
+    return piece::Type::EMPTY; // No attacker found
+}
+
+int see(const game_state::GameState &state, const moves::Move &move) {
+    std::vector<int> gain;
+    int square = move.to;
+    piece::Color side = utils::opposite_color(move.color);
+    int from_square;
+
+    // Initial capture
+    gain.push_back(PIECE_VALUES[state.get_board().get_piece_type(square)]);
+
+    int attacker = state.get_board().get_piece_type(move.from);
+    do {
+        gain.push_back(PIECE_VALUES[attacker] - gain.back());
+        attacker = get_least_valuable_attacker(state, square, side, from_square);
+        side = utils::opposite_color(side);
+    } while (attacker != piece::Type::EMPTY);
+
+    // Don't consider captures after king capture
+    while (gain.size() > 1 && gain[gain.size() - 2] == PIECE_VALUES[piece::Type::KING]) {
+        gain.pop_back();
+    }
+
+    // Negamax the gain sequence
+    for (int i = gain.size() - 1; i > 0; i--) {
+        gain[i - 1] = -std::max(-gain[i - 1], gain[i]);
+    }
+
+    return gain[0];
+}
+
+std::vector<moves::Move> generate_captures(game_state::GameState &state) {
+    std::vector<moves::Move> all_moves = moves::generate_legal_moves(state.turn, state);
+    std::vector<moves::Move> captures;
+    for (const auto &move : all_moves) {
+        if (move.move_type == moves::Type::CAPTURE || move.move_type == moves::Type::EN_PASSANT) {
+            captures.push_back(move);
+        }
+    }
+    return captures;
+}
+
+int material_score(piece::Color color, const game_state::GameState &state) {
+    const board::Board &board = state.get_board();
+    int score = 0;
+
+    for (int sq = 0; sq < 64; ++sq) {
+        piece::Type type = board.get_piece_type(sq);
+        piece::Color p_color = board.get_piece_color(sq);
+
+        if (type != piece::Type::EMPTY) {
+            int value = piece_value(type);
+            score += (p_color == color) ? value : -value;
+        }
+    }
+
+    return score;
 }
 
 int positional_score(piece::Color color, game_state::GameState &state) {
@@ -277,54 +361,136 @@ int positional_score(piece::Color color, game_state::GameState &state) {
     return (mg_score * mg_phase + eg_score * eg_phase) / 24;
 }
 
-int material_score(piece::Color color, game_state::GameState &state) {
-    board::Board board = state.get_board();
-    int white_material = 0;
-    int black_material = 0;
+int pawn_structure_score(piece::Color color, const game_state::GameState &state) {
+    const board::Board &board = state.get_board();
+    int score = 0;
 
-    for (int sq = 0; sq < 64; ++sq) {
-        piece::Type type = board.get_piece_type(sq);
-        piece::Color p_color = board.get_piece_color(sq);
+    // Evaluate doubled pawns
+    for (int file = 0; file < 8; ++file) {
+        int white_pawns = 0;
+        int black_pawns = 0;
+        for (int rank = 0; rank < 8; ++rank) {
+            int sq = rank * 8 + file;
+            if (board.get_piece_type(sq) == piece::Type::PAWN) {
+                if (board.get_piece_color(sq) == piece::Color::WHITE) {
+                    white_pawns++;
+                } else {
+                    black_pawns++;
+                }
+            }
+        }
+        if (white_pawns > 1)
+            score -= 10;
+        if (black_pawns > 1)
+            score += 10;
+    }
 
-        if (type != piece::Type::EMPTY) {
-            int material_value = piece_value(type); // Ensure material value is correct here
-            if (p_color == piece::Color::WHITE) {
-                white_material += material_value;
-            } else {
-                black_material += material_value;
+    // Evaluate isolated pawns
+    for (int file = 0; file < 8; ++file) {
+        bool white_pawn = false;
+        bool black_pawn = false;
+        for (int rank = 0; rank < 8; ++rank) {
+            int sq = rank * 8 + file;
+            if (board.get_piece_type(sq) == piece::Type::PAWN) {
+                if (board.get_piece_color(sq) == piece::Color::WHITE) {
+                    white_pawn = true;
+                } else {
+                    black_pawn = true;
+                }
+            }
+        }
+        if (white_pawn && (file == 0 || !board.get_pieces(piece::Type::PAWN, piece::Color::WHITE) & bit::Bitboard(1ULL << (file - 1))) &&
+            (file == 7 || !board.get_pieces(piece::Type::PAWN, piece::Color::WHITE) & bit::Bitboard(1ULL << (file + 1)))) {
+            score -= 20;
+        }
+        if (black_pawn && (file == 0 || !board.get_pieces(piece::Type::PAWN, piece::Color::BLACK) & bit::Bitboard(1ULL << (file - 1))) &&
+            (file == 7 || !board.get_pieces(piece::Type::PAWN, piece::Color::BLACK) & bit::Bitboard(1ULL << (file + 1)))) {
+            score += 20;
+        }
+    }
+
+    return (color == piece::Color::WHITE) ? score : -score;
+}
+
+int king_safety_score(piece::Color color, const game_state::GameState &state) {
+    const board::Board &board = state.get_board();
+    int score = 0;
+
+    // Evaluate king safety based on pawn shield
+    for (piece::Color c : {piece::Color::WHITE, piece::Color::BLACK}) {
+        int king_sq = __builtin_ctzll(board.get_pieces(piece::Type::KING, c));
+        int file = king_sq % 8;
+        int rank = king_sq / 8;
+
+        // Check pawns in front of the king
+        for (int f = std::max(0, file - 1); f <= std::min(7, file + 1); ++f) {
+            int pawn_sq = (c == piece::Color::WHITE) ? ((rank - 1) * 8 + f) : ((rank + 1) * 8 + f);
+            if (pawn_sq >= 0 && pawn_sq < 64 && board.get_piece_type(pawn_sq) == piece::Type::PAWN && board.get_piece_color(pawn_sq) == c) {
+                score += (c == piece::Color::WHITE) ? 10 : -10;
             }
         }
     }
-    return (color == piece::Color::WHITE) ? (white_material - black_material) : (black_material - white_material);
+
+    return (color == piece::Color::WHITE) ? score : -score;
 }
 
-int pawn_structure_score(piece::Color color, game_state::GameState &state) {
-    board::Board board = state.get_board();
-
-    return 0;
-}
-
-int king_safety_score(piece::Color color, game_state::GameState &state) {
-    board::Board board = state.get_board();
-
-    return 0;
-}
-
-int evaluate(piece::Color color, game_state::GameState &state) {
+int evaluate_position(piece::Color color, game_state::GameState &state) {
     if (state.is_checkmate()) {
-        return 9999999;
+        return -9999999;
     }
     if (state.is_stalemate() || state.is_draw_by_fifty_move_rule()) {
         return 0;
     }
 
-    // Evaluate from the perspective of the side to move
-    int score = positional_score(color, state);
+    int score = 0;
     score += material_score(color, state);
+    score += positional_score(color, state);
     score += pawn_structure_score(color, state);
     score += king_safety_score(color, state);
 
     return score;
+}
+
+int quiescence(int alpha, int beta, piece::Color color, game_state::GameState &state, int depth = 0) {
+    int stand_pat = evaluate_position(color, state);
+
+    if (stand_pat >= beta) {
+        return beta;
+    }
+    if (alpha < stand_pat) {
+        alpha = stand_pat;
+    }
+
+    if (depth >= 4) {
+        return stand_pat;
+    }
+
+    std::vector<moves::Move> captures = generate_captures(state);
+    captures = order::order_moves(captures, state);
+
+    for (const auto &move : captures) {
+        if (see(state, move) < 0) {
+            continue;
+        }
+
+        state.make_move(move);
+        int score = -quiescence(-beta, -alpha, utils::opposite_color(color), state, depth + 1);
+        state.unmake_move();
+
+        if (score >= beta) {
+            return beta;
+        }
+        if (score > alpha) {
+            alpha = score;
+        }
+    }
+
+    return alpha;
+}
+
+int evaluate(piece::Color color, game_state::GameState &state) {
+    // return evaluate_position(color, state);
+    return quiescence(std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), color, state);
 }
 
 } // namespace evaluate

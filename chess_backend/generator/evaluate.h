@@ -12,6 +12,7 @@ namespace evaluate {
 
 int evaluate(piece::Color color, game_state::GameState &state);
 int piece_value(piece::Type type);
+int quiescence(int alpha, int beta, piece::Color color, game_state::GameState &state, int depth = 0);
 
 } // namespace evaluate
 } // namespace chess_engine

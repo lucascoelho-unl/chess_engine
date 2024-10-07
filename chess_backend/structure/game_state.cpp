@@ -229,7 +229,6 @@ bool GameState::make_move(moves::Move move) {
 
     if (!(valid_moves & to_mask)) {
         std::cout << "Invalid move! Not in piece valid moves generated." << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         move_history.push_back(rev_move);
         return false;
     }

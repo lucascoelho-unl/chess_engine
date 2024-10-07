@@ -1,8 +1,10 @@
 #include "enums.h"
+#include "generator/evaluate.h"
 #include "generator/search.h"
 #include "generator/transposition.h"
 #include "generator/zobrist.h"
 #include "moves/moves.h"
+#include "structure/game_state.h"
 #include "structure/square.h"
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/strand.hpp>
@@ -12,11 +14,114 @@
 #include <boost/config.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <chrono>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <thread>
+
+// namespace chess_engine {
+// namespace search {
+
+// transposition::TranspositionTable tt(64); // 64 MB table
+
+// } // namespace search
+// } // namespace chess_engine
+
+// using namespace chess_engine;
+
+// // Function to print the board and evaluations
+// void print_board_and_eval(game_state::GameState &state, piece::Color color) {
+//     std::cout << state.get_board().to_string() << std::endl;
+
+//     int eval_func = evaluate::evaluate(color, state);
+
+//     // Get evaluation from transposition table
+//     uint64_t hash = zobrist::compute_hash(state);
+//     int tt_score;
+//     transposition::NodeType tt_type;
+//     moves::Move tt_move;
+//     bool is_valid_probing = search::tt.probe(hash, 0, tt_score, tt_type, tt_move);
+//     int tt_eval = is_valid_probing ? tt_score : 0;
+
+//     std::cout << "Evaluation function: " << eval_func << std::endl;
+//     if (tt_type == transposition::NodeType::EXACT) {
+//         std::cout << "Transposition table evaluation: " << tt_eval << std::endl;
+//         std::cout << "Found position in transposition table!" << std::endl;
+//         std::cout << "Evaluation: " << tt_score << std::endl;
+//         std::cout << "Hash: " << hash << std::endl;
+//         std::cout << moves::to_string(tt_move) << std::endl;
+//         std::cout << std::endl;
+//     }
+//     // std::this_thread::sleep_for(std::chrono::seconds(5));
+// }
+
+// int main() {
+//     // Initialize Zobrist keys
+//     zobrist::init_zobrist_keys();
+
+//     // Set initial FEN for the starting position
+//     // std::string fen = "Bk6/B7/8/8/8/8/8/K b KQkq - 0 1";
+//     // std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1";
+//     std::string fen = "rn1q1rk1/pbppbppp/1p2pn2/8/2PP4/2N2NP1/PPQ1PPBP/R1B1K2R b KQ - 0 1";
+
+//     // Initialize game state from FEN
+//     game_state::GameState game_state = game_state::set_game_state(fen);
+
+//     // Game loop
+//     piece::Color current_turn = game_state.turn;
+//     int move_number = 1;
+//     int max_moves = 150; // Limit the number of moves to prevent infinite games
+
+//     while (!game_state.is_game_over() && move_number <= max_moves) {
+
+//         // Measure time taken to find the best move
+//         auto start = std::chrono::high_resolution_clock::now();
+
+//         // Find the best move for the current player
+//         moves::Move best_move = search::find_best_move(4, current_turn, game_state);
+
+//         auto end = std::chrono::high_resolution_clock::now();
+//         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+//         std::cout << "Move " << move_number << " ("
+//                   << (current_turn == piece::Color::WHITE ? "White" : "Black")
+//                   << " to move):" << std::endl;
+
+//         print_board_and_eval(game_state, current_turn);
+
+//         // std::cout << "Time taken for move: " << duration.count() << " ms" << std::endl;
+
+//         // // Make the best move
+//         // std::cout << "Best move: " << square::int_position_to_string(best_move.from)
+//         //           << " to " << square::int_position_to_string(best_move.to) << std::endl;
+
+//         if (!game_state.make_move(best_move)) {
+//             std::cout << moves::to_string(best_move) << std::endl;
+//         }
+
+//         // Switch turns
+//         current_turn = utils::opposite_color(current_turn);
+//         move_number++;
+
+//         // Add a small delay to make the output readable
+//         // std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+//     }
+
+//     // Print final board state
+//     std::cout << "Final board state:" << std::endl;
+//     print_board_and_eval(game_state, current_turn);
+
+//     if (game_state.is_game_over()) {
+//         std::cout << "Game over!" << std::endl;
+//         // You can add more detailed end-game information here
+//     } else {
+//         std::cout << "Maximum number of moves reached." << std::endl;
+//     }
+
+//     return 0;
+// }
 
 namespace beast = boost::beast;   // From <boost/beast.hpp>
 namespace http = beast::http;     // From <boost/beast/http.hpp>
@@ -24,8 +129,13 @@ namespace net = boost::asio;      // From <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp; // From <boost/asio/ip/tcp.hpp>
 using namespace chess_engine;
 
-// Global transposition table
+namespace chess_engine {
+namespace search {
+
 transposition::TranspositionTable tt(64); // 64 MB table
+
+} // namespace search
+} // namespace chess_engine
 
 // Function to handle CORS and respond to POST requests
 void handle_request(http::request<http::string_body> &&req, http::response<http::string_body> &res) {
