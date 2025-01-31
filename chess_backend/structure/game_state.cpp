@@ -59,6 +59,42 @@ bool GameState::is_draw_by_fifty_move_rule() {
     return halfmove_clock >= 100;
 }
 
+bool GameState::is_draw_by_repetition() const {
+    if (move_history.size() < 6) { // Need at least 6 half-moves (3 for each color)
+        return false;
+    }
+
+    // Collect the last three moves for white and black
+    std::vector<moves::Reversible_Move> white_moves;
+    std::vector<moves::Reversible_Move> black_moves;
+
+    // Iterate over the move history in reverse using rbegin() and rend()
+    for (auto it = move_history.rbegin(); it != move_history.rend(); ++it) {
+        if (white_moves.size() < 3 && (std::distance(it, move_history.rend()) % 2 == 0)) {
+            // White's move (even index)
+            white_moves.push_back(*it);
+        } else if (black_moves.size() < 3 && (std::distance(it, move_history.rend()) % 2 != 0)) {
+            // Black's move (odd index)
+            black_moves.push_back(*it);
+        }
+
+        // Break early if we have collected 3 moves for both sides
+        if (white_moves.size() == 3 && black_moves.size() == 3) {
+            break;
+        }
+    }
+
+    // Check if the last 3 white moves are the same
+    if (white_moves.size() == 3 && (white_moves[0] == white_moves[1] && white_moves[1] == white_moves[2])) {
+        // Check if the last 3 black moves are the same
+        if (black_moves.size() == 3 && (black_moves[0] == black_moves[1] && black_moves[1] == black_moves[2])) {
+            return true; // Threefold repetition detected
+        }
+    }
+
+    return false; // No repetition found
+}
+
 bool GameState::is_game_over() {
     if (is_checkmate()) {
         return true;
@@ -72,8 +108,10 @@ bool GameState::is_game_over() {
         return true;
     }
 
-    // You can add other draw conditions here, such as:
-    // - Threefold repetition
+    if (is_draw_by_repetition()) {
+        return true;
+    }
+
     // - Insufficient material
 
     return false;

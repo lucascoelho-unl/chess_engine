@@ -1,3 +1,7 @@
+# How to run?
+chess_engine: /Users/lucascoelho/Desktop/chess_engine/build/chess_engine
+chess_board: npm start
+
 # Project planning
 
 I'm currently developing a project of a chess engine, and it is in progress. Below is the planning for making the engine and board ui.
@@ -121,10 +125,3 @@ Implemented a function for each piece to generate a bitboard with all valid move
 
 ## Game State Representation
 Implemented a game state class that holds all important information for the game of chess. It holds the board, en-passant square, castling rights, and total move counts.
-
-I'd love your help for instructions, next steps, how to proceed when I finish each step, and also with advices on how the project structure should be, and all that. I'll attatch my current files on the next few messages, and when I'm done, I'll send you a message asking for the 
-
-I hope we have an amazing project together. 
-
-Sincerely, 
-Lucas. 

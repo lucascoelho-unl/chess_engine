@@ -438,7 +438,7 @@ int evaluate_position(piece::Color color, game_state::GameState &state) {
     if (state.is_checkmate()) {
         return -9999999;
     }
-    if (state.is_stalemate() || state.is_draw_by_fifty_move_rule()) {
+    if (state.is_stalemate() || state.is_draw_by_fifty_move_rule() || state.is_draw_by_repetition()) {
         return 0;
     }
 

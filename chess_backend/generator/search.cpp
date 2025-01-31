@@ -41,9 +41,21 @@ std::pair<int, moves::Move> negamax(int depth, int alpha, int beta, piece::Color
         }
     }
 
-    // Base case: If the game is over or max depth is reached, return evaluation
-    if (game_state.is_game_over()) {
+    // Base case: If the game is over or max  depth is reached, returnevaluation
+    if (game_state.is_checkmate()) {
         return {evaluate::evaluate(color, game_state) * (depth + 1), moves::Move()};
+    }
+
+    if (game_state.is_stalemate()) {
+        return {0, moves::Move()};
+    }
+
+    if (game_state.is_draw_by_fifty_move_rule()) {
+        return {0, moves::Move()};
+    }
+
+    if (game_state.is_draw_by_repetition()) {
+        return {0, moves::Move()};
     }
 
     if (depth == 0) {

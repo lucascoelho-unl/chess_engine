@@ -48,6 +48,7 @@ class GameState {
     bool is_checkmate();
     bool is_stalemate();
     bool is_draw_by_fifty_move_rule();
+    bool is_draw_by_repetition() const;
     bool is_game_over();
     bool is_square_attacked(int sq, piece::Color color) const;
     void switch_turn();
@@ -58,7 +59,6 @@ class GameState {
     GameState copy() const;
 
     bool make_move(moves::Move move);
-    bool make_pseudo_move(moves::Move move);
     bool unmake_move();
 
     // Const version of get_board (read-only access)

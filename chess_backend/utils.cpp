@@ -45,6 +45,25 @@ std::string piece_type_to_string(piece::Type type) {
     }
 }
 
+std::string piece_type_to_char(piece::Type type) {
+    switch (type) {
+    case piece::Type::PAWN:
+        return "p";
+    case piece::Type::KNIGHT:
+        return "n";
+    case piece::Type::BISHOP:
+        return "b";
+    case piece::Type::ROOK:
+        return "r";
+    case piece::Type::QUEEN:
+        return "q";
+    case piece::Type::KING:
+        return "k";
+    default:
+        return "n";
+    }
+}
+
 std::string move_type_to_string(moves::Type type) {
     switch (type) {
     case moves::Type::NORMAL:

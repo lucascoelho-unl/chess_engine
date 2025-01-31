@@ -61,6 +61,9 @@ struct Reversible_Move {
     int en_passant_square;
     int halfmove_clock;
     int fullmove_number;
+
+    bool operator==(const Reversible_Move &other) const;
+    bool operator!=(const Reversible_Move &other) const;
 };
 
 // Get moves from a specific square for a piece of the specified color

@@ -24,6 +24,8 @@ std::string move_type_to_string(moves::Type type);
 
 std::string piece_type_to_string(piece::Type type);
 
+std::string piece_type_to_char(piece::Type type);
+
 std::string piece_color_to_string(piece::Color color);
 
 } // namespace utils

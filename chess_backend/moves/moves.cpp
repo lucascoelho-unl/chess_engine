@@ -49,6 +49,14 @@ bool is_square_attacked_after_move(int square, piece::Color attacker_color, cons
     return temp_game_state.is_square_attacked(square, move.color);
 }
 
+bool Reversible_Move::operator==(const Reversible_Move &other) const {
+    return move == other.move;
+}
+
+bool Reversible_Move::operator!=(const Reversible_Move &other) const {
+    return !(*this == other);
+}
+
 bool Move::operator==(const Move &other) const {
     return from == other.from && to == other.to && promotion == other.promotion;
 }

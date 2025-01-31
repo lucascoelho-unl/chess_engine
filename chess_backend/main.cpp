@@ -167,9 +167,10 @@ void handle_request(http::request<http::string_body> &&req, http::response<http:
             // Convert the move positions to chess notation strings using square::int_position_to_string
             std::string from_str = square::int_position_to_string(best_move.from);
             std::string to_str = square::int_position_to_string(best_move.to);
+            std::string promotion_str = utils::piece_type_to_char(best_move.promotion);
 
             // Respond with the move in JSON format
-            std::string response_body = "{\"from\": \"" + from_str + "\", \"to\": \"" + to_str + "\"}";
+            std::string response_body = "{\"from\": \"" + from_str + "\", \"to\": \"" + to_str + "\", \"promotion\": \"" + promotion_str + "\"}";
             res.body() = response_body;
             res.set(http::field::content_type, "application/json");
             res.set(http::field::access_control_allow_origin, "*"); // Handle CORS
