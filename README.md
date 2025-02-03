@@ -1,6 +1,7 @@
 # How to run?
-chess_engine: /Users/lucascoelho/Desktop/chess_engine/build/chess_engine
-chess_board: npm start
+
+### chess_engine: /Users/lucascoelho/Desktop/chess_engine/build/chess_engine
+### chess_board: npm start
 
 # Project planning
 
